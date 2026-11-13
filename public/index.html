@@ -3,25 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>REUM — Drömrummet · 3D Swedish Experiential Space</title>
-  <meta name="description" content="An interactive 3D experiential dream room for Swedish whimsical homeware brand Reum.store. Wander through tactile ceramics, candlelit hearths, and Scandinavian craft.">
+  <title>REUM — Luminous Swedish Homeware (reum.store)</title>
+  <meta name="description" content="A cinematic 3D botanical dream space for Swedish whimsical homeware brand Reum.store. Wander through glowing Nordic flora, tactile ceramics, and turned wood.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F4EFE6;
-      --paper: #FAF7F0;
-      --butter: #FEE78A;
+      --bg: #090A0E;
+      --paper: #F6F2EB;
+      --gold: #E5C384;
+      --amber: #FF9B42;
       --lingon: #D93829;
-      --lingon-bright: #FF3E2E;
-      --moss: #2A4832;
-      --cobalt: #1F4294;
-      --ink: #181614;
-      --bark: #382F28;
+      --moss: #3B5A45;
       --bone: #F5EFE6;
-      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -36,8 +32,8 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #000;
-      color: var(--ink);
+      background: var(--bg);
+      color: var(--bone);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
@@ -48,7 +44,7 @@
       }
     }
 
-    /* Fullscreen WebGL Canvas */
+    /* WebGL Canvas */
     #webgl-canvas {
       position: fixed;
       inset: 0;
@@ -59,23 +55,31 @@
       touch-action: none;
     }
 
-    /* Subtle Paper Grain Overlay */
-    #paper-grain {
+    /* Cinematic Vignette & Grain Overlay */
+    #vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(5, 6, 8, 0.75) 100%);
+    }
+
+    #film-grain {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 20;
-      mix-blend-mode: multiply;
-      opacity: 0.28;
+      z-index: 11;
+      mix-blend-mode: overlay;
+      opacity: 0.22;
     }
 
-    /* Custom Fluid Whimsical Cursor */
+    /* Minimalist High-Fashion Fluid Cursor */
     #cursor {
       position: fixed;
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       top: 0;
       left: 0;
       pointer-events: none;
@@ -94,28 +98,52 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background: var(--lingon);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFF;
+      border: 1.5px solid rgba(245, 239, 230, 0.65);
+      display: grid;
+      place-items: center;
+      transition: transform 0.4s var(--ease), border-color 0.3s, background-color 0.3s;
+    }
+
+    .cur-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      transition: transform 0.3s var(--ease), opacity 0.3s;
+    }
+
+    .cur-label {
+      position: absolute;
+      font-family: 'Antonio', sans-serif;
       font-size: 11px;
-      font-weight: 800;
-      transition: transform 0.3s var(--ease-bounce), background-color 0.25s;
-      box-shadow: 0 8px 24px rgba(217, 56, 41, 0.4);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #FFF;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.3s var(--ease);
     }
 
     #cursor.hover .cur-ring {
       transform: scale(1.6);
-      background: var(--cobalt);
+      border-color: var(--gold);
+      background: rgba(229, 195, 132, 0.15);
+      backdrop-filter: blur(2px);
+    }
+    #cursor.hover .cur-dot {
+      opacity: 0;
+    }
+    #cursor.hover .cur-label {
+      opacity: 1;
+      transform: scale(1);
     }
 
-    #cursor.grab .cur-ring {
+    #cursor.drag .cur-ring {
       transform: scale(0.8);
-      background: var(--moss);
+      border-color: var(--amber);
     }
 
-    /* INTERFACE LAYER (Above 3D Canvas) */
+    /* INTERFACE LAYER (Above WebGL) */
     .ui-layer {
       position: fixed;
       inset: 0;
@@ -124,7 +152,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 24px 32px;
+      padding: 32px 48px;
     }
 
     .ui-layer a, .ui-layer button, .ui-layer .interactive {
@@ -139,324 +167,398 @@
       width: 100%;
     }
 
-    .logo-container {
+    .brand-group {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(250, 247, 240, 0.85);
-      backdrop-filter: blur(16px);
-      padding: 10px 20px;
-      border-radius: 99px;
-      border: 2px solid var(--ink);
-      box-shadow: 4px 4px 0px var(--ink);
+      align-items: baseline;
+      gap: 14px;
     }
 
-    .logo-text {
-      font-family: 'Fraunces', serif;
-      font-size: 28px;
-      font-weight: 900;
-      font-style: italic;
-      line-height: 1;
-      color: var(--ink);
-      transition: color 0.2s;
-    }
-
-    .logo-text:hover {
-      color: var(--lingon);
-    }
-
-    .badge-nordic {
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
+    .brand-logo {
+      font-family: 'Antonio', sans-serif;
+      font-size: 32px;
       font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      background: var(--butter);
-      padding: 3px 8px;
-      border-radius: 99px;
-      border: 1px solid var(--ink);
+      color: var(--bone);
+      transition: color 0.3s;
     }
 
-    /* Camera Hotspots & Sound Pills */
-    .nav-pills {
+    .brand-logo:hover {
+      color: var(--gold);
+    }
+
+    .brand-sub {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: rgba(245, 239, 230, 0.6);
+    }
+
+    .nav-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 20px;
     }
 
-    .pill-btn {
+    .glass-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(250, 247, 240, 0.9);
-      backdrop-filter: blur(16px);
-      padding: 10px 18px;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 10px 22px;
       border-radius: 99px;
-      border: 2px solid var(--ink);
+      color: var(--bone);
       font-size: 12px;
-      font-weight: 700;
-      box-shadow: 3px 3px 0px var(--ink);
-      transition: transform 0.2s var(--ease-bounce), background-color 0.2s, box-shadow 0.2s;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.3s var(--ease);
       cursor: pointer;
     }
 
-    .pill-btn:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0px var(--ink);
-      background: var(--butter);
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
     }
 
-    .pill-btn.active {
-      background: var(--lingon);
-      color: #FFF;
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    .bag-btn {
-      background: var(--lingon);
-      color: #FFF;
-    }
-    .bag-btn:hover {
-      background: var(--lingon-bright);
-    }
-
-    @media (max-width: 820px) {
-      .nav-pills .tour-pill {
-        display: none;
-      }
-      .ui-layer {
-        padding: 16px;
-      }
-    }
-
-    /* Sound indicator bars */
     .sound-bars {
       display: flex;
       align-items: flex-end;
       gap: 2.5px;
-      height: 16px;
+      height: 14px;
     }
 
     .sound-bar {
-      width: 3px;
+      width: 2px;
       background: currentColor;
       border-radius: 1px;
-      height: 4px;
+      height: 3px;
       transition: height 0.2s;
     }
 
-    body.sound-on .sound-bar:nth-child(1) { animation: s-bar 0.5s infinite alternate; }
-    body.sound-on .sound-bar:nth-child(2) { animation: s-bar 0.7s 0.15s infinite alternate; }
-    body.sound-on .sound-bar:nth-child(3) { animation: s-bar 0.4s 0.3s infinite alternate; }
+    body.sound-active .sound-bar:nth-child(1) { animation: s-anim 0.6s infinite alternate; }
+    body.sound-active .sound-bar:nth-child(2) { animation: s-anim 0.8s 0.2s infinite alternate; }
+    body.sound-active .sound-bar:nth-child(3) { animation: s-anim 0.5s 0.4s infinite alternate; }
 
-    @keyframes s-bar {
+    @keyframes s-anim {
       0% { height: 3px; }
-      100% { height: 16px; }
+      100% { height: 14px; }
     }
 
-    /* Bottom HUD: Atmosphere Selector & Navigation Hints */
-    .bottom-hud {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
+    /* Center Ambient Hero Copy */
+    .hero-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
       width: 100%;
-      gap: 16px;
+      max-width: 900px;
+      padding: 0 24px;
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
     }
 
-    .atmosphere-bar {
+    .hero-center.blurred {
+      opacity: 0.15;
+      transform: translate(-50%, -50%) scale(0.96);
+    }
+
+    .hero-eyebrow {
+      font-family: 'Antonio', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+
+    .hero-headline {
+      font-family: 'Antonio', sans-serif;
+      font-size: clamp(54px, 9.5vw, 128px);
+      line-height: 0.88;
+      letter-spacing: -0.015em;
+      text-transform: uppercase;
+      color: var(--bone);
+      text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .hero-headline span {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--gold);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .hero-caption {
+      margin-top: 24px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: clamp(16px, 1.8vw, 20px);
+      line-height: 1.45;
+      color: rgba(245, 239, 230, 0.75);
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Bottom Bar & Instructions */
+    .bottom-bar {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(250, 247, 240, 0.9);
-      backdrop-filter: blur(16px);
-      padding: 6px 10px;
-      border-radius: 99px;
-      border: 2px solid var(--ink);
-      box-shadow: 4px 4px 0px var(--ink);
+      justify-content: space-between;
+      width: 100%;
     }
 
-    .atmo-btn {
-      padding: 8px 14px;
-      border-radius: 99px;
-      border: 1.5px solid transparent;
+    .instruction-text {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245, 239, 230, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .instruction-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 10px var(--amber);
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .timeline-scrubber {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .scrub-pill {
       font-size: 11px;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s var(--ease-bounce);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: rgba(245, 239, 230, 0.7);
+      transition: all 0.2s;
       cursor: pointer;
     }
 
-    .atmo-btn.active {
-      background: var(--ink);
-      color: #FFF;
-      border-color: var(--ink);
-    }
-
-    .instruction-card {
-      background: rgba(250, 247, 240, 0.85);
-      backdrop-filter: blur(12px);
-      padding: 10px 18px;
-      border-radius: 99px;
-      border: 2px solid var(--ink);
-      box-shadow: 3px 3px 0px var(--ink);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--bark);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .scrub-pill:hover, .scrub-pill.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(229, 195, 132, 0.1);
     }
 
     @media (max-width: 768px) {
-      .instruction-card {
+      .ui-layer {
+        padding: 20px;
+      }
+      .brand-sub {
         display: none;
       }
-      .bottom-hud {
+      .instruction-text {
+        display: none;
+      }
+      .bottom-bar {
         justify-content: center;
       }
     }
 
-    /* 3D OBJECT FOCUS INSPECTOR SHEET (Pops up when an object is clicked in 3D) */
-    #object-inspector {
+    /* OBJECT DETAIL OVERLAY (Cinematic Inspection Sheet) */
+    #detail-overlay {
       position: fixed;
-      bottom: 100px;
-      left: 32px;
+      inset: 0;
       z-index: 50;
-      width: min(380px, calc(100vw - 64px));
-      background: var(--paper);
-      border: 3px solid var(--ink);
-      border-radius: 28px;
-      padding: 24px;
-      box-shadow: 8px 8px 0px var(--ink);
-      transform: translateY(140%) scale(0.9);
+      background: rgba(9, 10, 14, 0.75);
+      backdrop-filter: blur(28px);
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      padding: 80px 8vw;
+      align-items: center;
+      gap: 6vw;
       opacity: 0;
       pointer-events: none;
-      transition: transform 0.5s var(--ease-bounce), opacity 0.4s var(--ease-smooth);
+      transition: opacity 0.6s var(--ease);
     }
 
-    #object-inspector.active {
-      transform: translateY(0) scale(1);
+    #detail-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
 
-    .insp-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 2px solid var(--ink);
-      background: var(--bone);
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .insp-close:hover {
-      background: var(--butter);
-    }
-
-    .insp-badge {
-      display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--moss);
-      background: var(--bone);
-      padding: 4px 10px;
-      border-radius: 99px;
-      border: 1px solid var(--ink);
-      margin-bottom: 8px;
-    }
-
-    .insp-title {
-      font-family: 'Fraunces', serif;
-      font-size: 26px;
-      font-weight: 900;
-      line-height: 1.1;
-      color: var(--ink);
-    }
-
-    .insp-sub {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--lingon);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-top: 4px;
-    }
-
-    .insp-desc {
-      font-size: 13px;
-      color: var(--bark);
-      line-height: 1.45;
-      margin-top: 10px;
-    }
-
-    .insp-meta {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1.5px dashed var(--ink);
-      font-size: 11px;
-      color: var(--bark);
+    .detail-left {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 20px;
+      max-width: 520px;
     }
 
-    .insp-row {
+    .detail-close-btn {
+      position: fixed;
+      top: 36px;
+      right: 48px;
+      font-family: 'Antonio', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--bone);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 24px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .detail-close-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .det-badge {
+      font-family: 'Antonio', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .det-title {
+      font-family: 'Antonio', sans-serif;
+      font-size: clamp(42px, 5.5vw, 76px);
+      line-height: 0.95;
+      letter-spacing: -0.015em;
+      text-transform: uppercase;
+      color: var(--bone);
+    }
+
+    .det-swedish {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--gold);
+    }
+
+    .det-desc {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.55;
+      color: rgba(245, 239, 230, 0.85);
+      margin-top: 6px;
+    }
+
+    .det-specs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(245, 239, 230, 0.6);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 16px;
+    }
+
+    .det-action-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 24px;
       margin-top: 16px;
     }
 
-    .insp-price {
-      font-family: 'Fraunces', serif;
-      font-size: 28px;
-      font-weight: 900;
-      color: var(--ink);
+    .det-price {
+      font-family: 'Antonio', sans-serif;
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--bone);
     }
 
-    .adopt-btn {
-      background: var(--lingon);
-      color: #FFF;
-      font-size: 13px;
-      font-weight: 800;
-      padding: 12px 24px;
+    .det-buy-btn {
+      flex: 1;
+      background: var(--gold);
+      color: #090A0E;
+      font-family: 'Antonio', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 16px 32px;
       border-radius: 99px;
-      border: 2px solid var(--ink);
-      box-shadow: 3px 3px 0px var(--ink);
+      border: none;
       cursor: pointer;
-      transition: all 0.2s var(--ease-bounce);
+      box-shadow: 0 10px 30px rgba(229, 195, 132, 0.3);
+      transition: all 0.3s var(--ease);
     }
 
-    .adopt-btn:hover {
-      background: var(--lingon-bright);
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0px var(--ink);
+    .det-buy-btn:hover {
+      background: #FFF;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(229, 195, 132, 0.5);
     }
 
-    /* SLIDE-OVER BAG DRAWER */
+    .detail-right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .det-img-frame {
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 4 / 5;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .det-img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @media (max-width: 820px) {
+      #detail-overlay {
+        grid-template-columns: 1fr;
+        padding: 80px 24px 40px;
+        overflow-y: auto;
+      }
+      .detail-right {
+        order: -1;
+      }
+      .det-img-frame {
+        max-width: 280px;
+      }
+    }
+
+    /* CART SLIDE DRAWER */
     #cart-drawer {
       position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
       width: min(440px, 100vw);
-      background: var(--paper);
-      border-left: 3px solid var(--ink);
+      background: #0D0F14;
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
       z-index: 200;
       transform: translateX(105%);
-      transition: transform 0.45s var(--ease-smooth);
-      box-shadow: -15px 0 45px rgba(0, 0, 0, 0.3);
+      transition: transform 0.5s var(--ease);
+      box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
     }
@@ -466,75 +568,58 @@
     }
 
     .cart-head {
-      padding: 24px;
-      background: var(--butter);
-      border-bottom: 2px solid var(--ink);
+      padding: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
+    .cart-title {
+      font-family: 'Antonio', sans-serif;
+      font-size: 24px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--bone);
+    }
+
     .cart-items {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 24px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+    }
+
+    .cart-foot {
+      padding: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .cart-item {
-      display: flex;
-      gap: 14px;
-      padding: 16px;
-      background: #FFF;
-      border: 2px solid var(--ink);
-      border-radius: 18px;
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    .cart-foot {
-      padding: 24px;
-      border-top: 2px solid var(--ink);
-      background: #FFF;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .checkout-btn {
-      width: 100%;
-      padding: 16px;
-      border-radius: 99px;
-      border: 3px solid var(--ink);
-      background: var(--lingon);
-      color: #FFF;
-      font-size: 15px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      box-shadow: 4px 4px 0px var(--ink);
-      cursor: pointer;
-      transition: all 0.2s var(--ease-bounce);
-    }
-
-    .checkout-btn:hover {
-      background: var(--lingon-bright);
-      transform: translate(-2px, -2px);
-      box-shadow: 6px 6px 0px var(--ink);
-    }
-
-    /* Intro Loading Screen */
+    /* Loader */
     #loader {
       position: fixed;
       inset: 0;
-      background: #FAF7F0;
+      background: #090A0E;
       z-index: 999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.8s ease, visibility 0.8s;
+      transition: opacity 1s var(--ease), visibility 1s;
     }
 
     #loader.gone {
@@ -543,69 +628,68 @@
       pointer-events: none;
     }
 
-    .loader-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid var(--butter);
-      border-top-color: var(--lingon);
+    .loader-dot {
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      background: var(--gold);
+      box-shadow: 0 0 20px var(--gold);
+      animation: pulse-load 1.4s infinite ease-in-out;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @keyframes pulse-load {
+      0%, 100% { transform: scale(0.6); opacity: 0.4; }
+      50% { transform: scale(1.6); opacity: 1; }
     }
   </style>
+
   <!-- Three.js (r128 via Cloudflare CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-  <!-- Fullscreen Three.js WebGL Canvas -->
+  <!-- Fullscreen WebGL 3D Canvas -->
   <canvas id="webgl-canvas"></canvas>
 
-  <!-- Paper Grain Layer -->
-  <svg id="paper-grain" xmlns="http://www.w3.org/2000/svg">
-    <filter id="grainFilter">
-      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch" />
-      <feColorMatrix values="0 0 0 0 0.35   0 0 0 0 0.32   0 0 0 0 0.28   0 0 0 0 0.22 0" />
+  <!-- Film Grain & Vignette -->
+  <div id="vignette"></div>
+  <svg id="film-grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix values="0 0 0 0 0.8   0 0 0 0 0.8   0 0 0 0 0.8   0 0 0 0.25 0" />
     </filter>
-    <rect width="100%" height="100%" filter="url(#grainFilter)" />
+    <rect width="100%" height="100%" filter="url(#grain)" />
   </svg>
 
-  <!-- Custom Fluid Cursor -->
+  <!-- Custom Cursor -->
   <div id="cursor">
-    <div class="cur-ring" id="cur-ring">✦</div>
+    <div class="cur-ring">
+      <div class="cur-dot"></div>
+      <span class="cur-label">Explore</span>
+    </div>
   </div>
 
-  <!-- Loading Screen -->
+  <!-- Intro Loader -->
   <div id="loader">
-    <div class="loader-spinner"></div>
-    <p class="font-serif" style="margin-top: 20px; font-size: 24px; font-weight: 800; font-style: italic;">
-      Välkommen till Reum...
+    <div class="loader-dot"></div>
+    <p style="font-family:'Antonio',sans-serif; font-size:16px; letter-spacing:0.2em; text-transform:uppercase; color:var(--bone); margin-top:20px;">
+      Reum · Stockholm
     </p>
-    <p style="font-size: 12px; color: var(--bark); margin-top: 6px;">Entering 3D Swedish Dream Room</p>
   </div>
 
-  <!-- INTERFACE HUD (Fixed Above 3D Scene) -->
+  <!-- UI OVERLAY -->
   <div class="ui-layer">
     
-    <!-- Top Header -->
+    <!-- Header -->
     <header>
-      <div class="logo-container">
-        <a href="#" class="logo-text">Reum</a>
-        <span class="badge-nordic">Sverige</span>
+      <div class="brand-group">
+        <a href="#" class="brand-logo">REUM</a>
+        <span class="brand-sub">Sverige · Curious Homeware</span>
       </div>
 
-      <!-- Navigation Hotspots & Bag -->
-      <div class="nav-pills">
-        <button class="pill-btn tour-pill active" onclick="flyToWaypoint('overview')">✦ Översikt</button>
-        <button class="pill-btn tour-pill" onclick="flyToWaypoint('table')">🍞 Duka (Table)</button>
-        <button class="pill-btn tour-pill" onclick="flyToWaypoint('candles')">🕯️ Ljus (Hearth)</button>
-        <button class="pill-btn tour-pill" onclick="flyToWaypoint('window')">🌿 Solrum</button>
-
-        <button class="pill-btn" id="sound-btn" onclick="toggleAudio()">
-          <span>📻 Fika Radio</span>
+      <div class="nav-actions">
+        <button class="glass-btn" id="sound-btn" onclick="toggleSound()">
+          <span>Sound</span>
           <div class="sound-bars">
             <div class="sound-bar"></div>
             <div class="sound-bar"></div>
@@ -613,530 +697,387 @@
           </div>
         </button>
 
-        <button class="pill-btn bag-btn" onclick="toggleCart(true)">
+        <button class="glass-btn" onclick="toggleCart(true)">
           <span>Bag</span>
-          <span id="bag-count" style="background:#FFF; color:var(--ink); padding:2px 7px; border-radius:99px; font-size:11px;">0</span>
+          <span id="bag-count" style="color:var(--gold); margin-left:4px;">0</span>
         </button>
       </div>
     </header>
 
-    <!-- Bottom Controls & Atmosphere Switcher -->
-    <div class="bottom-hud">
-      
-      <!-- Atmosphere Switcher -->
-      <div class="atmosphere-bar">
-        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; padding-left: 6px; color: var(--bark);">Ljus:</span>
-        <button class="atmo-btn active" onclick="setLightingMode('morning')" id="atmo-morning">
-          <span>🌅</span><span>Morgonsol</span>
-        </button>
-        <button class="atmo-btn" onclick="setLightingMode('fika')" id="atmo-fika">
-          <span>☕</span><span>Fikastund</span>
-        </button>
-        <button class="atmo-btn" onclick="setLightingMode('midnight')" id="atmo-midnight">
-          <span>🌌</span><span>Midnattssol</span>
-        </button>
+    <!-- Center Hero Typography -->
+    <div class="hero-center" id="hero-center">
+      <div class="hero-eyebrow">✦ Kollektion 01 · Solrum 2026</div>
+      <h1 class="hero-headline">
+        Grown in Whimsy. <br />
+        <span>A room with a wink.</span>
+      </h1>
+      <p class="hero-caption">
+        Wander through the botanical meadow. Touch the glowing Scandinavian heirlooms, inspect their Swedish craft, and let your home dance.
+      </p>
+    </div>
+
+    <!-- Bottom HUD -->
+    <div class="bottom-bar">
+      <div class="instruction-text">
+        <div class="instruction-dot"></div>
+        <span>Drag to orbit space · Scroll to glide · Click objects to inspect</span>
       </div>
 
-      <!-- Interactive Help Instructions -->
-      <div class="instruction-card">
-        <span>✦ Drag to explore · Scroll to zoom · Click any 3D object to inspect</span>
+      <div class="timeline-scrubber">
+        <button class="scrub-pill active" onclick="orbitTo(0)">The Wiggle Crock</button>
+        <button class="scrub-pill" onclick="orbitTo(1)">Twin Candlestick</button>
+        <button class="scrub-pill" onclick="orbitTo(2)">Baltic Linens</button>
+        <button class="scrub-pill" onclick="orbitTo(3)">Bobbin Lamp</button>
+        <button class="scrub-pill" onclick="orbitTo(4)">Fika Mug</button>
+        <button class="scrub-pill" onclick="orbitTo(5)">Cast Brass Box</button>
       </div>
-
     </div>
 
   </div>
 
-  <!-- 3D OBJECT FOCUS INSPECTION CARD -->
-  <div id="object-inspector">
-    <button class="insp-close" onclick="closeInspector()">✕</button>
-    <span class="insp-badge" id="insp-category">Bord & Fika</span>
-    <h3 class="insp-title" id="insp-title">The Wiggle Butter Dish</h3>
-    <p class="insp-sub" id="insp-subtitle">Smörask med vågkant</p>
-    <p class="insp-desc" id="insp-desc">
-      Glazed earthenware crock with an undulating wavy rim and mushroom knob. Handcrafted for unhurried Swedish morning breakfasts.
-    </p>
+  <!-- OBJECT INSPECTION MODAL -->
+  <div id="detail-overlay" role="dialog" aria-modal="true">
+    <button class="detail-close-btn" onclick="closeDetail()">✕ Close View</button>
 
-    <div class="insp-meta">
-      <div><strong>Provenance:</strong> <span id="insp-provenance">Alcobaça, Portugal</span></div>
-      <div><strong>Material:</strong> <span id="insp-material">High-fire earthenware, food-safe glaze</span></div>
-      <div><strong>Dimensions:</strong> <span id="insp-dimensions">14cm L × 10cm W × 8.5cm H</span></div>
+    <div class="detail-left">
+      <span class="det-badge" id="det-cat">Tableware · Duka</span>
+      <h2 class="det-title" id="det-title">The Wiggle Butter Dish</h2>
+      <p class="det-swedish" id="det-sub">Smörask med vågkant</p>
+      <p class="det-desc" id="det-desc">
+        A cheerful hand-glazed earthenware butter crock with an undulating wavy rim and spherical mushroom knob. Handcrafted for slow Swedish Sunday breakfasts.
+      </p>
+
+      <div class="det-specs">
+        <div><strong>Provenance:</strong> <span id="det-prov">Alcobaça, Portugal</span></div>
+        <div><strong>Material:</strong> <span id="det-mat">High-fire earthenware, food-safe glaze</span></div>
+        <div><strong>Dimensions:</strong> <span id="det-dim">14cm L × 10cm W × 8.5cm H</span></div>
+      </div>
+
+      <div class="det-action-row">
+        <span class="det-price" id="det-price">$58</span>
+        <button class="det-buy-btn" id="det-add-btn">Adopt to Bag +</button>
+      </div>
     </div>
 
-    <div class="insp-row">
-      <span class="insp-price" id="insp-price">$58</span>
-      <button class="adopt-btn" id="insp-add-btn">Adopt to Bag +</button>
+    <div class="detail-right">
+      <div class="det-img-frame">
+        <img id="det-img" src="" alt="Product Detail" />
+      </div>
     </div>
   </div>
 
-  <!-- CART SLIDE-OVER DRAWER -->
-  <aside id="cart-drawer" aria-label="Shopping Bag">
+  <!-- SLIDE-OVER BAG DRAWER -->
+  <aside id="cart-drawer">
     <div class="cart-head">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:24px;">🛍️</span>
-        <h3 class="font-serif" style="font-size:24px; font-weight:900;">Your Reum Bag</h3>
-      </div>
-      <button onclick="toggleCart(false)" style="font-size: 24px; font-weight: 800; cursor:pointer;">✕</button>
+      <h3 class="cart-title">Your Bag</h3>
+      <button onclick="toggleCart(false)" style="color:var(--bone); font-size:22px; cursor:pointer;">✕</button>
     </div>
 
     <div class="cart-items" id="cart-items">
-      <!-- Items dynamically populated -->
+      <!-- Items inserted dynamically -->
     </div>
 
     <div class="cart-foot">
-      <div style="display:flex; justify-content:space-between; font-weight:800; font-size:18px;">
-        <span>Subtotal:</span>
-        <span id="cart-subtotal">$0 USD</span>
+      <div style="display:flex; justify-content:space-between; font-family:'Antonio',sans-serif; font-size:20px;">
+        <span>Total:</span>
+        <span id="cart-subtotal" style="color:var(--gold);">$0 USD</span>
       </div>
-      <p style="font-size:11px; color:var(--bark);">
-        ✦ Seed paper unboxing note & plastic-free packaging included.
+      <p style="font-size:11px; color:rgba(245,239,230,0.6);">
+        ✦ Free shipping on orders over $120. Plastic-free Swedish packaging.
       </p>
-      <button class="checkout-btn" onclick="triggerCheckout()">
+      <button class="det-buy-btn" style="width:100%; border-radius:99px;" onclick="triggerCheckout()">
         Proceed to Checkout →
       </button>
     </div>
   </aside>
 
-  <!-- THREE.JS 3D EXPERIENTIAL SCENE SCRIPT -->
+  <!-- THREE.JS BOTANICAL MEADOW & 3D HOMEPAGE SHADERS -->
   <script>
-    (function() {
+    (function () {
       'use strict';
 
-      // ─── 1. Product Catalog Data ───
-      const PRODUCTS = {
-        butter: {
+      // ─── 1. Product Data ───
+      const PRODUCTS = [
+        {
           id: 'butter',
           name: 'The Wiggle Butter Dish',
-          subtitle: 'Smörask med vågkant',
-          category: 'Duka · Portugal',
+          sub: 'Smörask med vågkant',
+          cat: 'Tableware · Duka',
           price: 58,
-          provenance: 'Handmade in Alcobaça, Portugal',
-          material: 'High-fire glazed earthenware',
-          dimensions: '14cm L × 10cm W × 8.5cm H',
-          desc: 'An iconic ceramic butter dish with an undulating wiggle rim and spherical mushroom knob.',
-          img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=300&q=80',
-          cameraPos: { x: -1.2, y: 2.1, z: 2.2 },
-          targetPos: { x: -1.2, y: 1.45, z: 0.5 },
+          prov: 'Handmade in Alcobaça, Portugal',
+          mat: 'High-fire glazed earthenware',
+          dim: '14cm L × 10cm W × 8.5cm H',
+          desc: 'A joyful butter crock featuring an undulating wavy lid and mushroom knob in sunny Buttercup Yellow and Lingonberry Red.',
+          img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=800&q=80',
         },
-        candlestick: {
-          id: 'candlestick',
+        {
+          id: 'candle',
           name: 'Krumelur Twist Candlestick',
-          subtitle: 'Tvilling-ljusstake',
-          category: 'Ljus · Portugal',
+          sub: 'Tvilling-ljusstake',
+          cat: 'Candles & Glow · Ljus',
           price: 64,
-          provenance: 'Cast in Caldas da Rainha, Portugal',
-          material: 'Matte-finish speckled ceramic stoneware',
-          dimensions: '19cm H × 14cm W',
-          desc: 'Asymmetric twin spiral ceramic candlestick holding hand-dipped Swedish beeswax tapers.',
-          img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=300&q=80',
-          cameraPos: { x: 0.2, y: 2.4, z: 2.0 },
-          targetPos: { x: 0.2, y: 1.6, z: 0.3 },
+          prov: 'Cast in Caldas da Rainha, Portugal',
+          mat: 'Matte-finish speckled stoneware',
+          dim: '19cm H × 14cm W',
+          desc: 'Asymmetric twin helical candlestick designed to hold double taper candles in joyful conversation. Inspired by Dalarna ironcraft.',
+          img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=800&q=80',
         },
-        lamp: {
+        {
+          id: 'linen',
+          name: 'Skogsbär Scallop Napkins',
+          sub: 'Linneduk med vågkant',
+          cat: 'Baltic Linens · Textil',
+          price: 72,
+          prov: 'Woven & sewn in Kaunas, Lithuania',
+          mat: '100% Pre-washed Baltic Flax',
+          dim: '45cm × 45cm (Set of 4)',
+          desc: 'Substantial European linen finished with a vibrant lingonberry-red scalloped merrow border. Gets softer with every Sunday fika.',
+          img: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=800&q=80',
+        },
+        {
           id: 'lamp',
           name: 'Bobbin Turned Birch Lamp',
-          subtitle: 'Svarvad bordslampa med plissering',
-          category: 'Ljus · Småland',
+          sub: 'Svarvad bordslampa',
+          cat: 'Lighting · Ljus',
           price: 165,
-          provenance: 'Turned in Småland, Sweden',
-          material: 'FSC Scandinavian Birch, pleated cotton shade',
-          dimensions: '42cm H × 26cm Shade Diameter',
-          desc: 'Spindle-turned solid birch lamp base paired with a pleated blue gingham empire shade.',
-          img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&q=80',
-          cameraPos: { x: 2.1, y: 2.8, z: 2.2 },
-          targetPos: { x: 1.8, y: 1.9, z: 0.2 },
+          prov: 'Turned in Småland, Sweden',
+          mat: 'FSC Scandinavian Birch, pleated cotton',
+          dim: '42cm H × 26cm Shade Diameter',
+          desc: 'Spindle-turned solid birch spheres paired with a pleated blue-and-cream gingham empire shade. Emits an amber bedtime glow.',
+          img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80',
         },
-        mug: {
+        {
           id: 'mug',
           name: 'The Fika Loop Mug',
-          subtitle: 'Kopp för fikastunder',
-          category: 'Duka · Alcobaça',
+          sub: 'Kopp för fikastunder',
+          cat: 'Tableware · Duka',
           price: 38,
-          provenance: 'Thrown in Alcobaça, Portugal',
-          material: 'Dense culinary stoneware with butter glaze',
-          dimensions: '360ml capacity, 9cm diameter',
-          desc: 'Chunky handmade fika mug with an oversized circular ring handle and warm buttercup glaze.',
-          img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80',
-          cameraPos: { x: -0.4, y: 2.0, z: 2.1 },
-          targetPos: { x: -0.4, y: 1.45, z: 0.6 },
+          prov: 'Wheel-thrown in Alcobaça, Portugal',
+          mat: 'Dense stoneware with butter glaze',
+          dim: '360ml capacity, 9cm diameter',
+          desc: 'Chunky handmade fika mug with an oversized circular hoop handle. White speckled clay outside, sunny yellow inside.',
+          img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
         },
-        matchbox: {
-          id: 'matchbox',
+        {
+          id: 'brass',
           name: 'Trollskogen Cast Brass Box',
-          subtitle: 'Mässingsfodral för tändstickor',
-          category: 'Småsaker · Moradabad',
+          sub: 'Mässingsfodral för tändstickor',
+          cat: 'Curios · Småsaker',
           price: 48,
-          provenance: 'Sand-cast in solid unlacquered brass',
-          material: '100% Solid Brass (develops rich patina)',
-          dimensions: '11.5cm L × 6.5cm W',
-          desc: 'Heavy cast brass matchbox cover embossed with whimsical Swedish forest flora.',
-          img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=300&q=80',
-          cameraPos: { x: 0.9, y: 1.9, z: 2.0 },
-          targetPos: { x: 0.85, y: 1.45, z: 0.5 },
+          prov: 'Sand-cast in Moradabad, India',
+          mat: '100% Solid Unlacquered Brass',
+          dim: '11.5cm L × 6.5cm W',
+          desc: 'A weighty heirloom cover that slips over any matchbox. Hand-cast with whimsical Swedish forest ferns and a tiny hidden mushroom.',
+          img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
         }
-      };
+      ];
 
-      // ─── 2. Camera Waypoints ───
-      const WAYPOINTS = {
-        overview: { pos: { x: 0, y: 3.8, z: 5.6 }, target: { x: 0, y: 1.2, z: 0 } },
-        table:    { pos: { x: -0.8, y: 2.4, z: 2.8 }, target: { x: -0.4, y: 1.4, z: 0.4 } },
-        candles:  { pos: { x: 0.3, y: 2.3, z: 2.0 }, target: { x: 0.2, y: 1.6, z: 0.3 } },
-        window:   { pos: { x: 2.6, y: 2.8, z: 3.4 }, target: { x: 1.5, y: 1.8, z: -0.5 } }
-      };
-
-      let currentCamPos = { ...WAYPOINTS.overview.pos };
-      let targetCamPos = { ...WAYPOINTS.overview.pos };
-      let currentLookAt = { ...WAYPOINTS.overview.target };
-      let targetLookAt = { ...WAYPOINTS.overview.target };
-
-      // ─── 3. Three.js Scene Setup ───
+      // ─── 2. WebGL Scene & Renderer Setup ───
       const canvas = document.getElementById('webgl-canvas');
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
+      renderer.toneMappingExposure = 1.15;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xF4EFE6);
-      scene.fog = new THREE.FogExp2(0xF4EFE6, 0.045);
+      scene.background = new THREE.Color(0x090A0E);
+      scene.fog = new THREE.FogExp2(0x090A0E, 0.055);
 
-      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 50);
-      camera.position.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
-      camera.lookAt(currentLookAt.x, currentLookAt.y, currentLookAt.z);
+      const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 1.4, 7.5);
 
-      // ─── 4. Lighting System ───
-      const ambientLight = new THREE.AmbientLight(0xFFF9EE, 0.9);
-      scene.add(ambientLight);
+      // ─── 3. Glowing Meadow Particles with GLSL Shaders ───
+      // 2,500 glowing flower and firefly spores blooming across 3D space
+      const particleCount = 2400;
+      const positions = new Float32Array(particleCount * 3);
+      const randoms = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
 
-      const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xEDE2D0, 0.6);
-      scene.add(hemiLight);
+      const palette = [
+        new THREE.Color(0xE5C384), // Gold
+        new THREE.Color(0xFF9B42), // Warm Amber
+        new THREE.Color(0xD93829), // Lingonberry Red
+        new THREE.Color(0x4E8752), // Forest Spore Green
+        new THREE.Color(0xFFF2D1), // Cream Pollen
+      ];
 
-      const sunLight = new THREE.DirectionalLight(0xFFF3D6, 1.8);
-      sunLight.position.set(6, 8, 4);
-      sunLight.castShadow = true;
-      sunLight.shadow.mapSize.width = 2048;
-      sunLight.shadow.mapSize.height = 2048;
-      sunLight.shadow.bias = -0.0005;
-      scene.add(sunLight);
+      for (let i = 0; i < particleCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const radius = 2.5 + Math.random() * 9.5;
+        const x = Math.cos(theta) * radius;
+        const z = Math.sin(theta) * radius;
+        const y = -1.2 + (Math.random() - 0.5) * 3.2;
 
-      // Candle Flame Lights (PointLights that flicker)
-      const candleLight1 = new THREE.PointLight(0xFFA500, 0.9, 3.5);
-      candleLight1.position.set(0.12, 1.95, 0.3);
-      scene.add(candleLight1);
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
 
-      const candleLight2 = new THREE.PointLight(0xFFA500, 0.9, 3.5);
-      candleLight2.position.set(0.28, 1.95, 0.3);
-      scene.add(candleLight2);
+        randoms[i * 3] = Math.random();
+        randoms[i * 3 + 1] = Math.random();
+        randoms[i * 3 + 2] = Math.random();
 
-      // ─── 5. Room Architecture ───
+        const col = palette[Math.floor(Math.random() * palette.length)];
+        colors[i * 3] = col.r;
+        colors[i * 3 + 1] = col.g;
+        colors[i * 3 + 2] = col.b;
+      }
 
-      // Procedural Checkerboard Floor Canvas Texture (Terracotta & Oatmeal)
-      function createFloorTexture() {
-        const c = document.createElement('canvas');
-        c.width = 512;
-        c.height = 512;
-        const ctx = c.getContext('2d');
-        const size = 64;
-        for (let x = 0; x < 512; x += size) {
-          for (let y = 0; y < 512; y += size) {
-            const isDark = ((x / size) + (y / size)) % 2 === 0;
-            ctx.fillStyle = isDark ? '#C76A58' : '#FAF5EC';
-            ctx.fillRect(x, y, size, size);
+      const particleGeo = new THREE.BufferGeometry();
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      particleGeo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
+      particleGeo.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
+
+      // Custom GLSL Shader for glowing, pulsing, mouse-reactive botanical spores
+      const particleMat = new THREE.ShaderMaterial({
+        vertexShader: `
+          uniform float uTime;
+          uniform vec2 uMouse;
+          attribute vec3 aRandom;
+          attribute vec3 aColor;
+          varying vec3 vColor;
+          varying float vDist;
+
+          void main() {
+            vColor = aColor;
+            vec3 pos = position;
+
+            // Gentle waving organic drift
+            pos.x += sin(uTime * 0.4 + aRandom.x * 6.28) * 0.18;
+            pos.y += cos(uTime * 0.5 + aRandom.y * 6.28) * 0.15;
+            pos.z += sin(uTime * 0.3 + aRandom.z * 6.28) * 0.18;
+
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            
+            // Size attenuation with pulsing
+            float pulse = 0.8 + 0.35 * sin(uTime * 2.0 + aRandom.x * 10.0);
+            gl_PointSize = (18.0 * aRandom.z + 12.0) * pulse * (1.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vColor;
+
+          void main() {
+            // Soft circular bloom point
+            vec2 coord = gl_PointCoord - vec2(0.5);
+            float dist = length(coord);
+            if (dist > 0.5) discard;
+
+            // Glowing radial falloff with bright white core
+            float alpha = smoothstep(0.5, 0.0, dist);
+            vec3 finalColor = mix(vColor, vec3(1.0, 0.98, 0.9), smoothstep(0.3, 0.0, dist));
+
+            gl_FragColor = vec4(finalColor, alpha * 0.85);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uMouse: { value: new THREE.Vector2(0, 0) },
+        }
+      });
+
+      const particlePoints = new THREE.Points(particleGeo, particleMat);
+      scene.add(particlePoints);
+
+      // ─── 4. 3D Floating Kinetic Product Arc ───
+      const cardsGroup = new THREE.Group();
+      scene.add(cardsGroup);
+
+      const textureLoader = new THREE.TextureLoader();
+      const cardMeshes = [];
+      const CARD_COUNT = PRODUCTS.length;
+      const ARC_RADIUS = 4.2;
+
+      // Card Geometry: Rounded bevel plaque with photographic face
+      const cardGeo = new THREE.PlaneGeometry(1.6, 2.0);
+
+      PRODUCTS.forEach((prod, idx) => {
+        const tex = textureLoader.load(prod.img);
+        tex.generateMipmaps = true;
+
+        const mat = new THREE.MeshBasicMaterial({
+          map: tex,
+          side: THREE.DoubleSide,
+        });
+
+        const mesh = new THREE.Mesh(cardGeo, mat);
+        mesh.userData.index = idx;
+        mesh.userData.product = prod;
+
+        // Brass Frame Trim behind the picture
+        const frameGeo = new THREE.PlaneGeometry(1.66, 2.06);
+        const frameMat = new THREE.MeshBasicMaterial({ color: 0xE5C384, side: THREE.DoubleSide });
+        const frame = new THREE.Mesh(frameGeo, frameMat);
+        frame.position.z = -0.01;
+        mesh.add(frame);
+
+        cardsGroup.add(mesh);
+        cardMeshes.push(mesh);
+      });
+
+      // ─── 5. State, Physics & Orbital Positioning ───
+      let arcAngle = 0;
+      let targetArcAngle = 0;
+      let isDragging = false;
+      let startMouseX = 0;
+      let startAngle = 0;
+      let activeIndex = 0;
+      let isDetailActive = false;
+
+      function updateCardTransforms() {
+        const step = (Math.PI * 2) / CARD_COUNT;
+
+        for (let i = 0; i < CARD_COUNT; i++) {
+          const mesh = cardMeshes[i];
+          const theta = arcAngle + i * step;
+
+          // Elliptical orbit with depth curve
+          const x = Math.sin(theta) * ARC_RADIUS;
+          const z = Math.cos(theta) * (ARC_RADIUS * 0.75) - 0.5;
+          const y = Math.sin(theta * 2.0) * 0.15;
+
+          mesh.position.set(x, y, z);
+          mesh.rotation.y = theta + Math.PI;
+
+          // Parallax tilt towards center
+          mesh.rotation.z = Math.sin(theta) * 0.08;
+
+          // Depth fog & scaling for distant cards
+          const distFromFront = Math.cos(theta); // 1 = front, -1 = back
+          const scale = 0.75 + 0.35 * Math.max(0, distFromFront);
+          mesh.scale.set(scale, scale, scale);
+
+          // Darken back cards
+          if (mesh.material) {
+            mesh.material.opacity = Math.max(0.2, 0.4 + 0.6 * distFromFront);
+            mesh.material.transparent = true;
           }
         }
-        const tex = new THREE.CanvasTexture(c);
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(12, 12);
-        return tex;
       }
 
-      const floorGeo = new THREE.PlaneGeometry(30, 30);
-      const floorMat = new THREE.MeshStandardMaterial({
-        map: createFloorTexture(),
-        roughness: 0.65,
-        metalness: 0.05,
-      });
-      const floor = new THREE.Mesh(floorGeo, floorMat);
-      floor.rotation.x = -Math.PI / 2;
-      floor.receiveShadow = true;
-      scene.add(floor);
+      window.orbitTo = function (targetIdx) {
+        playChime();
+        activeIndex = targetIdx;
+        const step = (Math.PI * 2) / CARD_COUNT;
+        targetArcAngle = -targetIdx * step;
 
-      // Back Wall with Arch Window Cutout
-      const wallMat = new THREE.MeshStandardMaterial({
-        color: 0xFDFBF7,
-        roughness: 0.9,
-      });
-      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(30, 14), wallMat);
-      backWall.position.set(0, 7, -5);
-      backWall.receiveShadow = true;
-      scene.add(backWall);
+        document.querySelectorAll('.scrub-pill').forEach((p, i) => {
+          if (i === targetIdx) p.classList.add('active');
+          else p.classList.remove('active');
+        });
+      };
 
-      // Arched Window Frame with Nordic Forest View
-      const windowGroup = new THREE.Group();
-      windowGroup.position.set(1.5, 4.5, -4.95);
-
-      const windowGlass = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.2, 4.8),
-        new THREE.MeshBasicMaterial({ color: 0xDDF0FF, opacity: 0.6, transparent: true })
-      );
-      windowGroup.add(windowGlass);
-
-      const frameMat = new THREE.MeshStandardMaterial({ color: 0x4A3728, roughness: 0.7 });
-      const mullionV = new THREE.Mesh(new THREE.BoxGeometry(0.08, 4.8, 0.08), frameMat);
-      const mullionH = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.08, 0.08), frameMat);
-      windowGroup.add(mullionV);
-      windowGroup.add(mullionH);
-      scene.add(windowGroup);
-
-      // Large Solid Scandinavian Timber Dining Table
-      const tableGroup = new THREE.Group();
-      tableGroup.position.set(0, 0, 0);
-
-      const woodMat = new THREE.MeshStandardMaterial({
-        color: 0xE4C9A2,
-        roughness: 0.5,
-        metalness: 0.05,
-      });
-
-      // Table Top (Rounded Chamfer Box)
-      const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.12, 2.2), woodMat);
-      tableTop.position.set(0, 1.35, 0.3);
-      tableTop.receiveShadow = true;
-      tableTop.castShadow = true;
-      tableGroup.add(tableTop);
-
-      // 4 Turned Timber Legs
-      const legPositions = [
-        [-2.1, 0.67, -0.6],
-        [2.1, 0.67, -0.6],
-        [-2.1, 0.67, 1.2],
-        [2.1, 0.67, 1.2],
-      ];
-      legPositions.forEach(([x, y, z]) => {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 1.35, 16), woodMat);
-        leg.position.set(x, y, z);
-        leg.castShadow = true;
-        tableGroup.add(leg);
-      });
-      scene.add(tableGroup);
-
-      // ─── 6. Interactive 3D Homeware Models ───
-      const interactiveMeshes = [];
-
-      // HELPER: Register an interactive object with bounding box for raycasting
-      function registerProduct(mesh, productKey) {
-        mesh.userData.productKey = productKey;
-        interactiveMeshes.push(mesh);
-      }
-
-      // MODEL 1: The Wiggle Butter Dish (Ceramic Crock)
-      const butterGroup = new THREE.Group();
-      butterGroup.position.set(-1.2, 1.41, 0.5);
-
-      const butterYellowMat = new THREE.MeshStandardMaterial({
-        color: 0xFEE78A,
-        roughness: 0.25,
-        metalness: 0.08,
-      });
-      const lingonRedMat = new THREE.MeshStandardMaterial({
-        color: 0xD93829,
-        roughness: 0.25,
-        metalness: 0.08,
-      });
-
-      // Base Crock
-      const crockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.28, 0.16, 32), butterYellowMat);
-      crockBase.position.y = 0.08;
-      crockBase.castShadow = true;
-      crockBase.receiveShadow = true;
-      butterGroup.add(crockBase);
-
-      // Wiggle Lid
-      const crockLid = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.33, 0.12, 32), lingonRedMat);
-      crockLid.position.y = 0.22;
-      crockLid.castShadow = true;
-      butterGroup.add(crockLid);
-
-      // Mushroom Knob
-      const knob = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), butterYellowMat);
-      knob.position.y = 0.32;
-      knob.scale.set(1.2, 0.8, 1.2);
-      butterGroup.add(knob);
-
-      scene.add(butterGroup);
-      registerProduct(crockBase, 'butter');
-      registerProduct(crockLid, 'butter');
-
-      // MODEL 2: Krumelur Twin Twist Candlestick + Beeswax Tapers + Flames
-      const candleGroup = new THREE.Group();
-      candleGroup.position.set(0.2, 1.41, 0.3);
-
-      const ceramicMossMat = new THREE.MeshStandardMaterial({
-        color: 0x2A4832,
-        roughness: 0.4,
-        metalness: 0.05,
-      });
-      const beeswaxMat = new THREE.MeshStandardMaterial({
-        color: 0xFFDC73,
-        roughness: 0.3,
-      });
-      const flameMat = new THREE.MeshBasicMaterial({ color: 0xFF9900 });
-
-      // Curved Ceramic Twin Stems
-      const stem1 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.04, 16, 32, Math.PI), ceramicMossMat);
-      stem1.rotation.z = Math.PI / 2;
-      stem1.position.set(-0.08, 0.22, 0);
-      stem1.castShadow = true;
-      candleGroup.add(stem1);
-
-      const stem2 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.04, 16, 32, Math.PI), ceramicMossMat);
-      stem2.rotation.z = -Math.PI / 2;
-      stem2.position.set(0.08, 0.22, 0);
-      stem2.castShadow = true;
-      candleGroup.add(stem2);
-
-      const candleBase = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.05, 32), ceramicMossMat);
-      candleBase.position.y = 0.025;
-      candleGroup.add(candleBase);
-
-      // Two Tapers
-      const taper1 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.025, 0.45, 16), beeswaxMat);
-      taper1.position.set(-0.08, 0.45, 0);
-      taper1.castShadow = true;
-      candleGroup.add(taper1);
-
-      const taper2 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.025, 0.45, 16), beeswaxMat);
-      taper2.position.set(0.08, 0.45, 0);
-      taper2.castShadow = true;
-      candleGroup.add(taper2);
-
-      // Animated Flame Meshes
-      const flameMesh1 = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.07, 8), flameMat);
-      flameMesh1.position.set(-0.08, 0.71, 0);
-      candleGroup.add(flameMesh1);
-
-      const flameMesh2 = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.07, 8), flameMat);
-      flameMesh2.position.set(0.08, 0.71, 0);
-      candleGroup.add(flameMesh2);
-
-      scene.add(candleGroup);
-      registerProduct(candleBase, 'candlestick');
-      registerProduct(taper1, 'candlestick');
-      registerProduct(taper2, 'candlestick');
-
-      // MODEL 3: Bobbin Turned Birch Lamp
-      const lampGroup = new THREE.Group();
-      lampGroup.position.set(1.8, 1.41, 0.2);
-
-      const birchMat = new THREE.MeshStandardMaterial({ color: 0xF3DFC4, roughness: 0.6 });
-      const shadeMat = new THREE.MeshStandardMaterial({ color: 0xFAF6EB, roughness: 0.8 });
-
-      // Spindle Bobbin Spheres
-      for (let i = 0; i < 4; i++) {
-        const bobbin = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), birchMat);
-        bobbin.position.y = 0.08 + i * 0.12;
-        bobbin.castShadow = true;
-        lampGroup.add(bobbin);
-      }
-      const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.06, 32), birchMat);
-      lampBase.position.y = 0.03;
-      lampGroup.add(lampBase);
-
-      // Pleated Gingham Empire Shade
-      const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.36, 0.38, 24, 1, true), shadeMat);
-      shade.position.y = 0.62;
-      shade.castShadow = true;
-      lampGroup.add(shade);
-
-      // Interior Lamp Glow PointLight
-      const lampGlow = new THREE.PointLight(0xFFE2A8, 1.2, 4);
-      lampGlow.position.set(0, 0.55, 0);
-      lampGroup.add(lampGlow);
-
-      scene.add(lampGroup);
-      registerProduct(lampBase, 'lamp');
-      registerProduct(shade, 'lamp');
-
-      // MODEL 4: The Swedish Fika Loop Mug
-      const mugGroup = new THREE.Group();
-      mugGroup.position.set(-0.4, 1.41, 0.6);
-
-      const mugMat = new THREE.MeshStandardMaterial({ color: 0xF8F3E6, roughness: 0.2 });
-      const mugBody = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.12, 0.22, 24), mugMat);
-      mugBody.position.y = 0.11;
-      mugBody.castShadow = true;
-      mugGroup.add(mugBody);
-
-      // Oversized Ring Handle
-      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.024, 12, 24), mugMat);
-      handle.position.set(0.14, 0.11, 0);
-      handle.rotation.y = Math.PI / 2;
-      mugGroup.add(handle);
-
-      // Coffee Liquid inside
-      const coffee = new THREE.Mesh(new THREE.CircleGeometry(0.115, 24), new THREE.MeshStandardMaterial({ color: 0x362014, roughness: 0.2 }));
-      coffee.rotation.x = -Math.PI / 2;
-      coffee.position.y = 0.2;
-      mugGroup.add(coffee);
-
-      scene.add(mugGroup);
-      registerProduct(mugBody, 'mug');
-
-      // MODEL 5: Trollskogen Cast Brass Matchbox
-      const matchboxGroup = new THREE.Group();
-      matchboxGroup.position.set(0.85, 1.41, 0.5);
-
-      const brassMat = new THREE.MeshStandardMaterial({
-        color: 0xDFAC4B,
-        metalness: 0.88,
-        roughness: 0.22,
-      });
-      const matchboxMesh = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.16), brassMat);
-      matchboxMesh.position.y = 0.03;
-      matchboxMesh.rotation.y = 0.35;
-      matchboxMesh.castShadow = true;
-      matchboxGroup.add(matchboxMesh);
-
-      scene.add(matchboxGroup);
-      registerProduct(matchboxMesh, 'matchbox');
-
-      // ─── 7. Floating Dandelion / Pollen Spores Particle System ───
-      const particleCount = 280;
-      const particleGeo = new THREE.BufferGeometry();
-      const particlePos = new Float32Array(particleCount * 3);
-
-      for (let i = 0; i < particleCount * 3; i += 3) {
-        particlePos[i] = (Math.random() - 0.5) * 12;
-        particlePos[i + 1] = Math.random() * 5 + 0.5;
-        particlePos[i + 2] = (Math.random() - 0.5) * 8;
-      }
-      particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
-
-      const particleMat = new THREE.PointsMaterial({
-        color: 0xFFEEB8,
-        size: 0.045,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const particles = new THREE.Points(particleGeo, particleMat);
-      scene.add(particles);
-
-      // ─── 8. Camera Controls, Raycasting & Drag Interaction ───
+      // ─── 6. Raycasting & Click-to-Inspect ───
       const raycaster = new THREE.Raycaster();
       const mouse = new THREE.Vector2(-999, -999);
-      let isDragging = false;
-      let prevMouseX = 0, prevMouseY = 0;
-      let orbitPhi = 0, orbitTheta = 0;
-      let activeProductKey = null;
 
-      // Cursor movement
       const cursor = document.getElementById('cursor');
-      const curRing = document.getElementById('cur-ring');
-      let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-      let mx = cx, my = cy;
+      let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      let cx = mx, cy = my;
 
       window.addEventListener('pointermove', (e) => {
         mx = e.clientX;
@@ -1146,161 +1087,100 @@
         mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
         if (isDragging) {
-          const dx = e.clientX - prevMouseX;
-          const dy = e.clientY - prevMouseY;
-          orbitTheta -= dx * 0.005;
-          orbitPhi = Math.max(-0.4, Math.min(0.6, orbitPhi + dy * 0.005));
-          prevMouseX = e.clientX;
-          prevMouseY = e.clientY;
+          const dx = e.clientX - startMouseX;
+          targetArcAngle = startAngle + (dx / window.innerWidth) * Math.PI * 1.5;
         }
 
-        // Raycast hovered objects
+        // Raycasting for cards
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(interactiveMeshes);
+        const intersects = raycaster.intersectObjects(cardMeshes);
 
-        if (intersects.length > 0) {
+        if (intersects.length > 0 && !isDetailActive) {
           cursor.classList.add('hover');
-          curRing.textContent = 'SE';
         } else {
           cursor.classList.remove('hover');
-          curRing.textContent = '✦';
         }
       });
 
       window.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.ui-layer, #object-inspector, #cart-drawer')) return;
+        if (e.target.closest('.ui-layer, #detail-overlay, #cart-drawer')) return;
         isDragging = true;
-        prevMouseX = e.clientX;
-        prevMouseY = e.clientY;
-        cursor.classList.add('grab');
+        startMouseX = e.clientX;
+        startAngle = targetArcAngle;
+        cursor.classList.add('drag');
       });
 
       window.addEventListener('pointerup', (e) => {
-        cursor.classList.remove('grab');
+        cursor.classList.remove('drag');
         if (!isDragging) return;
         isDragging = false;
 
-        // If click was a fast tap, check for object click
-        if (Math.abs(e.clientX - prevMouseX) < 6 && Math.abs(e.clientY - prevMouseY) < 6) {
+        // Snap to closest card if dragged
+        const step = (Math.PI * 2) / CARD_COUNT;
+        const closestIdx = Math.round(-targetArcAngle / step);
+        targetArcAngle = -closestIdx * step;
+
+        // If tap was direct on a card, open detail
+        if (Math.abs(e.clientX - startMouseX) < 6) {
           raycaster.setFromCamera(mouse, camera);
-          const intersects = raycaster.intersectObjects(interactiveMeshes);
+          const intersects = raycaster.intersectObjects(cardMeshes);
           if (intersects.length > 0) {
-            const key = intersects[0].object.userData.productKey;
-            inspectProduct(key);
+            openDetail(intersects[0].object.userData.product);
           }
         }
       });
 
       window.addEventListener('wheel', (e) => {
-        if (e.target.closest('#cart-drawer, #object-inspector')) return;
-        const zoomDelta = e.deltaY * 0.003;
-        targetCamPos.z = Math.max(1.8, Math.min(8.0, targetCamPos.z + zoomDelta));
+        if (isDetailActive) return;
+        targetArcAngle += (e.deltaY * 0.0018);
       }, { passive: true });
 
-      // Window resize
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+      // ─── 7. Inspection Detail Sheet ───
+      const detailOverlay = document.getElementById('detail-overlay');
+      const heroCenter = document.getElementById('hero-center');
 
-      // ─── 9. Waypoint & Product Inspection Functions ───
-      window.flyToWaypoint = function(wpKey) {
-        playClink();
-        document.querySelectorAll('.tour-pill').forEach(b => b.classList.remove('active'));
-        const activeBtn = Array.from(document.querySelectorAll('.tour-pill')).find(b => b.textContent.toLowerCase().includes(wpKey));
-        if (activeBtn) activeBtn.classList.add('active');
+      function openDetail(product) {
+        playChime();
+        isDetailActive = true;
+        heroCenter.classList.add('blurred');
 
-        const wp = WAYPOINTS[wpKey];
-        targetCamPos = { ...wp.pos };
-        targetLookAt = { ...wp.target };
-        orbitPhi = 0;
-        orbitTheta = 0;
-        closeInspector();
-      };
+        document.getElementById('det-cat').textContent = product.cat;
+        document.getElementById('det-title').textContent = product.name;
+        document.getElementById('det-sub').textContent = product.sub;
+        document.getElementById('det-desc').textContent = product.desc;
+        document.getElementById('det-prov').textContent = product.prov;
+        document.getElementById('det-mat').textContent = product.mat;
+        document.getElementById('det-dim').textContent = product.dim;
+        document.getElementById('det-price').textContent = `$${product.price}`;
+        document.getElementById('det-img').src = product.img;
 
-      window.inspectProduct = function(key) {
-        playClink();
-        const p = PRODUCTS[key];
-        if (!p) return;
-        activeProductKey = key;
-
-        targetCamPos = { ...p.cameraPos };
-        targetLookAt = { ...p.targetPos };
-        orbitPhi = 0;
-        orbitTheta = 0;
-
-        document.getElementById('insp-category').textContent = p.category;
-        document.getElementById('insp-title').textContent = p.name;
-        document.getElementById('insp-subtitle').textContent = p.subtitle;
-        document.getElementById('insp-desc').textContent = p.desc;
-        document.getElementById('insp-provenance').textContent = p.provenance;
-        document.getElementById('insp-material').textContent = p.material;
-        document.getElementById('insp-dimensions').textContent = p.dimensions;
-        document.getElementById('insp-price').textContent = `$${p.price}`;
-
-        const addBtn = document.getElementById('insp-add-btn');
-        addBtn.onclick = () => {
-          addToBag(p.name, p.price, p.img);
+        document.getElementById('det-add-btn').onclick = () => {
+          addToBag(product.name, product.price, product.img);
         };
 
-        document.getElementById('object-inspector').classList.add('active');
+        detailOverlay.classList.add('active');
+      }
+
+      window.closeDetail = function () {
+        playChime();
+        isDetailActive = false;
+        detailOverlay.classList.remove('active');
+        heroCenter.classList.remove('blurred');
       };
 
-      window.closeInspector = function() {
-        document.getElementById('object-inspector').classList.remove('active');
-        activeProductKey = null;
-      };
-
-      // ─── 10. Atmospheric Lighting Modes ───
-      window.setLightingMode = function(mode) {
-        playClink();
-        document.querySelectorAll('.atmo-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`atmo-${mode}`).classList.add('active');
-
-        if (mode === 'morning') {
-          scene.background.set(0xF4EFE6);
-          scene.fog.color.set(0xF4EFE6);
-          sunLight.color.set(0xFFF3D6);
-          sunLight.intensity = 1.8;
-          ambientLight.intensity = 0.9;
-          candleLight1.intensity = 0.4;
-          candleLight2.intensity = 0.4;
-          renderer.toneMappingExposure = 1.05;
-        } else if (mode === 'fika') {
-          scene.background.set(0xF7E2B4);
-          scene.fog.color.set(0xF7E2B4);
-          sunLight.color.set(0xFFB852);
-          sunLight.intensity = 1.6;
-          ambientLight.intensity = 0.7;
-          candleLight1.intensity = 0.8;
-          candleLight2.intensity = 0.8;
-          renderer.toneMappingExposure = 1.0;
-        } else if (mode === 'midnight') {
-          scene.background.set(0x182032);
-          scene.fog.color.set(0x182032);
-          sunLight.color.set(0x406090);
-          sunLight.intensity = 0.35;
-          ambientLight.intensity = 0.25;
-          candleLight1.intensity = 1.8;
-          candleLight2.intensity = 1.8;
-          renderer.toneMappingExposure = 1.25;
-        }
-      };
-
-      // ─── 11. Shopping Bag State & Drawer ───
+      // ─── 8. Shopping Bag State ───
       const cart = [];
-      window.toggleCart = function(open) {
+      window.toggleCart = function (open) {
         const d = document.getElementById('cart-drawer');
         if (open) d.classList.add('open');
         else d.classList.remove('open');
       };
 
-      window.addToBag = function(title, price, img) {
-        playClink();
-        const existing = cart.find(i => i.title === title);
+      window.addToBag = function (name, price, img) {
+        playChime();
+        const existing = cart.find(i => i.name === name);
         if (existing) existing.qty++;
-        else cart.push({ title, price, img, qty: 1 });
+        else cart.push({ name, price, img, qty: 1 });
         renderCart();
         toggleCart(true);
       };
@@ -1317,14 +1197,14 @@
           const el = document.createElement('div');
           el.className = 'cart-item';
           el.innerHTML = `
-            <img src="${item.img}" style="width:58px; height:58px; border-radius:12px; object-fit:cover; border:2px solid var(--ink);" />
+            <img src="${item.img}" style="width:58px; height:58px; border-radius:10px; object-fit:cover;" />
             <div style="flex:1;">
-              <h4 class="font-serif" style="font-size:15px; font-weight:800;">${item.title}</h4>
-              <p style="font-size:13px; font-weight:700; color:var(--lingon);">$${item.price} USD</p>
+              <h4 style="font-family:'Antonio',sans-serif; font-size:16px; color:var(--bone);">${item.name}</h4>
+              <p style="font-size:13px; color:var(--gold);">$${item.price} USD</p>
               <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-                <button onclick="updateQty(${idx}, -1)" style="font-weight:900; padding:2px 8px; border:1px solid var(--ink); border-radius:6px; cursor:pointer;">-</button>
-                <span style="font-size:12px; font-weight:700;">${item.qty}</span>
-                <button onclick="updateQty(${idx}, 1)" style="font-weight:900; padding:2px 8px; border:1px solid var(--ink); border-radius:6px; cursor:pointer;">+</button>
+                <button onclick="updateQty(${idx}, -1)" style="color:#FFF; padding:2px 8px; border:1px solid rgba(255,255,255,0.2); border-radius:4px; cursor:pointer;">-</button>
+                <span style="font-size:12px;">${item.qty}</span>
+                <button onclick="updateQty(${idx}, 1)" style="color:#FFF; padding:2px 8px; border:1px solid rgba(255,255,255,0.2); border-radius:4px; cursor:pointer;">+</button>
               </div>
             </div>
           `;
@@ -1335,154 +1215,125 @@
         document.getElementById('cart-subtotal').textContent = `$${total} USD`;
       }
 
-      window.updateQty = function(idx, delta) {
-        playClink();
+      window.updateQty = function (idx, delta) {
+        playChime();
         cart[idx].qty += delta;
         if (cart[idx].qty <= 0) cart.splice(idx, 1);
         renderCart();
       };
 
-      window.triggerCheckout = function() {
-        alert("✦ Välkommen till Reum.store!\n\nYour bag is ready. In production, this connects to Stripe Payment Links with $0/month in hosting costs!");
+      window.triggerCheckout = function () {
+        alert("✦ Välkommen till Reum.store!\n\nYour bag is ready. In production, this links directly to your free Stripe Checkout or Shopify Lite link ($0/month hosting fee)!");
       };
 
-      // ─── 12. Procedural Web Audio Synthesizer ───
+      // ─── 9. Generative Ambient Audio Synthesizer ───
       let audioCtx = null;
-      let isSoundOn = false;
-      let noiseNode = null;
-      let droneOsc = null;
+      let isSoundActive = false;
+      let drone1 = null, drone2 = null;
 
-      function playClink() {
+      function playChime() {
         if (!audioCtx) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          audioCtx = new AudioContextClass();
+          const AC = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AC();
         }
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(850 + Math.random() * 300, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.08);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520 + Math.random() * 300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + 0.12);
 
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.14);
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
+        osc.stop(audioCtx.currentTime + 0.15);
       }
 
-      window.toggleAudio = function() {
+      window.toggleSound = function () {
         if (!audioCtx) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          audioCtx = new AudioContextClass();
+          const AC = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AC();
         }
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        if (isSoundOn) {
-          if (noiseNode) { noiseNode.stop(); noiseNode = null; }
-          if (droneOsc) { droneOsc.stop(); droneOsc = null; }
-          isSoundOn = false;
-          document.body.classList.remove('sound-on');
+        if (isSoundActive) {
+          if (drone1) { drone1.stop(); drone1 = null; }
+          if (drone2) { drone2.stop(); drone2 = null; }
+          isSoundActive = false;
+          document.body.classList.remove('sound-active');
         } else {
-          // Hearth noise
-          const bufferSize = audioCtx.sampleRate * 2;
-          const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-          const out = noiseBuffer.getChannelData(0);
-          let lastOut = 0.0;
-          for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            out[i] = (lastOut + (0.02 * white)) / 1.02;
-            lastOut = out[i];
-            if (Math.random() < 0.001) out[i] += (Math.random() - 0.5) * 0.9;
-          }
+          // Ethereal Nordic D-minor drone chord (D2 + A2)
+          drone1 = audioCtx.createOscillator();
+          drone2 = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
 
-          noiseNode = audioCtx.createBufferSource();
-          noiseNode.buffer = noiseBuffer;
-          noiseNode.loop = true;
+          drone1.type = 'sine';
+          drone1.frequency.setValueAtTime(73.42, audioCtx.currentTime); // D2
+          drone2.type = 'triangle';
+          drone2.frequency.setValueAtTime(110.0, audioCtx.currentTime); // A2
 
           const filter = audioCtx.createBiquadFilter();
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+          filter.frequency.setValueAtTime(320, audioCtx.currentTime);
 
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
 
-          noiseNode.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.destination);
-          noiseNode.start();
+          drone1.connect(gain);
+          drone2.connect(gain);
+          gain.connect(filter);
+          filter.connect(audioCtx.destination);
 
-          // Harmonic Drone
-          droneOsc = audioCtx.createOscillator();
-          const droneGain = audioCtx.createGain();
-          droneOsc.type = 'sine';
-          droneOsc.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
-          droneGain.gain.setValueAtTime(0.018, audioCtx.currentTime);
-          droneOsc.connect(droneGain);
-          droneGain.connect(audioCtx.destination);
-          droneOsc.start();
+          drone1.start();
+          drone2.start();
 
-          isSoundOn = true;
-          document.body.classList.add('sound-on');
+          isSoundActive = true;
+          document.body.classList.add('sound-active');
         }
       };
 
-      // ─── 13. Main Render & Animation Loop ───
+      // ─── 10. Animation Loop ───
       let clock = new THREE.Clock();
 
       function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
 
-        // Candle flame dynamic flicker
-        const flicker1 = Math.sin(elapsedTime * 14) * 0.15 + (Math.random() - 0.5) * 0.12;
-        const flicker2 = Math.cos(elapsedTime * 18) * 0.15 + (Math.random() - 0.5) * 0.12;
-        flameMesh1.scale.set(1 + flicker1, 1 + flicker1 * 1.5, 1 + flicker1);
-        flameMesh2.scale.set(1 + flicker2, 1 + flicker2 * 1.5, 1 + flicker2);
-        candleLight1.intensity = 1.0 + flicker1;
-        candleLight2.intensity = 1.0 + flicker2;
+        // Update shader uniforms
+        particleMat.uniforms.uTime.value = elapsedTime;
 
-        // Animate particles drifting
-        const positions = particleGeo.attributes.position.array;
-        for (let i = 1; i < particleCount * 3; i += 3) {
-          positions[i] -= 0.004;
-          if (positions[i] < 0.5) positions[i] = 5.5;
-        }
-        particleGeo.attributes.position.needsUpdate = true;
+        // Smooth spring easing for arc rotation
+        arcAngle += (targetArcAngle - arcAngle) * 0.085;
+        updateCardTransforms();
 
-        // Smooth Camera Navigation Lerp
-        const finalTargetCamX = targetCamPos.x + Math.sin(orbitTheta) * 2;
-        const finalTargetCamZ = targetCamPos.z * Math.cos(orbitTheta);
-        const finalTargetCamY = targetCamPos.y + orbitPhi * 2;
+        // Gentle camera float
+        camera.position.x = Math.sin(elapsedTime * 0.3) * 0.25;
+        camera.position.y = 1.35 + Math.cos(elapsedTime * 0.4) * 0.15;
+        camera.lookAt(0, 0.4, 0);
 
-        currentCamPos.x += (finalTargetCamX - currentCamPos.x) * 0.055;
-        currentCamPos.y += (finalTargetCamY - currentCamPos.y) * 0.055;
-        currentCamPos.z += (finalTargetCamZ - currentCamPos.z) * 0.055;
-
-        currentLookAt.x += (targetLookAt.x - currentLookAt.x) * 0.055;
-        currentLookAt.y += (targetLookAt.y - currentLookAt.y) * 0.055;
-        currentLookAt.z += (targetLookAt.z - currentLookAt.z) * 0.055;
-
-        camera.position.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
-        camera.lookAt(currentLookAt.x, currentLookAt.y, currentLookAt.z);
-
-        // Cursor smoothing
-        cx += (mx - cx) * 0.25;
-        cy += (my - cy) * 0.25;
+        // Fluid cursor
+        cx += (mx - cx) * 0.22;
+        cy += (my - cy) * 0.22;
         cursor.style.left = `${cx}px`;
         cursor.style.top = `${cy}px`;
 
         renderer.render(scene, camera);
       }
 
-      // Hide Loader Once Scene is Loaded
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Remove loader
       setTimeout(() => {
         document.getElementById('loader').classList.add('gone');
         animate();
-      }, 400);
+      }, 500);
 
     })();
   </script>
