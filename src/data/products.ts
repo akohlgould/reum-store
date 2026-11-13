@@ -201,3 +201,4 @@ export const CATEGORIES = [
   { id: 'textil', name: 'Linens & Rest', swedish: 'Textilier' },
   { id: 'smasaker', name: 'Curios & Brass', swedish: 'Småsaker' },
 ];
+
