@@ -3,29 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Leon Vasari — Film Archive</title>
-  <meta name="description" content="Film archive and 3D VHS gallery for director Leon Vasari.">
+  <title>REUM — Drömrummet · 3D Swedish Experiential Space</title>
+  <meta name="description" content="An interactive 3D experiential dream room for Swedish whimsical homeware brand Reum.store. Wander through tactile ceramics, candlelit hearths, and Scandinavian craft.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Noto+Sans+JP:wght@500;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #ECE8E0;
-      --sheet: #F3F0EA;
-      --ink: #141414;
-      --muted: #6D6A63;
-      --cobalt: #1F3FB0;
-      --rule: rgba(20, 20, 20, 0.9);
-      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-      --H: min(47vh, 33vw);
-      --cy: 41%;
-    }
-
-    @media (max-width: 767px) {
-      :root {
-        --H: min(68vw, 40svh);
-        --cy: 43%;
-      }
+      --bg: #F4EFE6;
+      --paper: #FAF7F0;
+      --butter: #FEE78A;
+      --lingon: #D93829;
+      --lingon-bright: #FF3E2E;
+      --moss: #2A4832;
+      --cobalt: #1F4294;
+      --ink: #181614;
+      --bark: #382F28;
+      --bone: #F5EFE6;
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -40,9 +36,9 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: var(--paper);
+      background: #000;
       color: var(--ink);
-      font-family: "Inter Tight", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -52,492 +48,38 @@
       }
     }
 
-    a, button {
-      color: inherit;
-      text-decoration: none;
-      background: none;
-      border: 0;
-      font: inherit;
-      cursor: pointer;
+    /* Fullscreen WebGL Canvas */
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      touch-action: none;
     }
 
-    @media (pointer: fine) {
-      a, button {
-        cursor: none;
-      }
-    }
-
-    .lbl {
-      font-family: "Inter Tight", "Noto Sans JP", sans-serif;
-      font-weight: 600;
-      font-size: 10.5px;
-      line-height: 1;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .box {
-      display: inline-flex;
-      align-items: center;
-      height: 21px;
-      padding: 0 8px;
-      border: 1px solid var(--rule);
-      border-radius: 1px;
-    }
-
-    /* Paper grain overlay */
-    #grain {
+    /* Subtle Paper Grain Overlay */
+    #paper-grain {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 40;
-      mix-blend-mode: multiply;
-      opacity: 0.6;
-    }
-
-    /* Top Bar */
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 76px;
-      padding: 0 36px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--cobalt);
-      z-index: 30;
-    }
-
-    .brand-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .brand-line {
-      width: 40px;
-      height: 1px;
-      background: var(--cobalt);
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 34px;
-    }
-
-    .burger {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 26px;
-      height: 12px;
-    }
-
-    .burger span {
-      display: block;
-      width: 100%;
-      height: 1.5px;
-      background: var(--cobalt);
-    }
-
-    @media (max-width: 767px) {
-      header {
-        height: 60px;
-        padding: 0 16px;
-      }
-      .brand-line {
-        width: 22px;
-      }
-      .nav-links {
-        display: none;
-      }
-    }
-
-    /* Halftone Kanji Background */
-    .kanji {
-      position: fixed;
-      z-index: 1;
-      writing-mode: vertical-rl;
-      font-family: "Noto Sans JP", sans-serif;
-      font-weight: 900;
-      font-size: min(19vh, 12.5vw);
-      line-height: 1.02;
-      letter-spacing: 0.02em;
-      pointer-events: none;
-      background-image: radial-gradient(circle at 50% 50%, rgba(64, 82, 138, 0.55) 0 36%, transparent 40%), linear-gradient(rgba(110, 122, 160, 0.26), rgba(110, 122, 160, 0.26));
-      background-size: 3px 3px, 100% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .kanji-left {
-      left: 2.4vw;
-      top: 13vh;
-    }
-
-    .kanji-right {
-      right: 2.4vw;
-      top: 9vh;
-    }
-
-    @media (max-width: 767px) {
-      .kanji {
-        font-size: 22vw;
-        opacity: 0.8;
-      }
-    }
-
-    /* Floor Shadow */
-    #floor-shadow {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      top: calc(var(--cy) + var(--H) * 0.47);
-      width: min(96vw, calc(var(--H) * 3.6));
-      height: calc(var(--H) * 0.26);
-      background: radial-gradient(50% 50% at 50% 40%, rgba(40, 32, 20, 0.30), rgba(40, 32, 20, 0.10) 55%, transparent 72%);
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    /* Shelf & 3D Stage */
-    #shelf {
-      position: fixed;
-      left: 0;
-      right: 0;
-      top: calc(var(--cy) - var(--H) / 2 - 50px);
-      height: calc(var(--H) + 100px);
-      perspective: 1400px;
-      perspective-origin: 50% 50%;
-      z-index: 10;
-      touch-action: pan-y;
-      overflow: visible;
-    }
-
-    .stage {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 0;
-      height: 0;
-      transform-style: preserve-3d;
-    }
-
-    /* Each VHS Tape */
-    .tape {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 0;
-      height: 0;
-      transform-style: preserve-3d;
-      will-change: transform;
-      cursor: pointer;
-    }
-
-    .tape-face {
-      position: absolute;
-      height: var(--H);
-      top: calc(var(--H) * -0.5);
-      backface-visibility: hidden;
-      border-radius: 2px;
-      background-repeat: no-repeat;
-      overflow: hidden;
-    }
-
-    .tape-face::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: #000;
-      opacity: var(--shade, 0);
-      pointer-events: none;
-      transition: opacity 0.05s linear;
-    }
-
-    .sp {
-      left: calc(var(--ws) * -0.5);
-      width: var(--ws);
-      transform: translateZ(calc(var(--d) * 0.5));
-    }
-
-    .cv {
-      left: calc(var(--d) * -0.5);
-      width: var(--d);
-      transform: rotateY(90deg) translateZ(calc(var(--ws) * 0.5));
-      box-shadow: 0 34px 60px -30px rgba(20, 16, 10, 0.6);
-    }
-
-    /* Play Ring */
-    #play-ring {
-      position: fixed;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 1px solid var(--cobalt);
-      background: rgba(236, 232, 224, 0.85);
-      backdrop-filter: blur(2px);
-      display: grid;
-      place-items: center;
-      z-index: 15;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.3s var(--ease);
-    }
-
-    #play-ring svg {
-      width: 12px;
-      height: 12px;
-      fill: var(--cobalt);
-      margin-left: 2px;
-    }
-
-    /* Caption Section */
-    #caption {
-      position: fixed;
-      left: 0;
-      right: 0;
-      top: calc(var(--cy) + var(--H) * 0.5 + 4.2vh);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 10px;
       z-index: 20;
-      pointer-events: none;
+      mix-blend-mode: multiply;
+      opacity: 0.28;
     }
 
-    .mask-wrap {
-      overflow: hidden;
-      width: min(80vw, 640px);
-      position: relative;
-      display: flex;
-      justify-content: center;
-    }
-
-    .cap-title {
-      font-family: "Inter Tight", sans-serif;
-      font-weight: 600;
-      font-size: clamp(28px, 3.4vw, 46px);
-      line-height: 1.05;
-      letter-spacing: -0.015em;
-      color: var(--cobalt);
-      white-space: nowrap;
-      display: inline-block;
-    }
-
-    .cap-sub {
-      color: var(--cobalt);
-      font-size: 9.5px;
-      letter-spacing: 0.24em;
-    }
-
-    .cap-rule {
-      width: 18px;
-      height: 1px;
-      background: var(--cobalt);
-    }
-
-    .cap-year {
-      font-weight: 500;
-      font-size: 10.5px;
-      letter-spacing: 0.08em;
-      color: var(--ink);
-    }
-
-    /* Nav Arrows */
-    .nav-arrow {
-      position: fixed;
-      top: calc(var(--cy) + var(--H) * 0.5 + 4.2vh + 10px);
-      width: 44px;
-      height: 44px;
-      display: grid;
-      place-items: center;
-      color: var(--cobalt);
-      z-index: 25;
-      pointer-events: auto;
-      transition: transform 0.25s var(--ease), opacity 0.2s;
-    }
-
-    .nav-arrow:hover {
-      transform: scale(1.1);
-    }
-
-    .nav-arrow.prev {
-      left: calc(50% - min(19vw, 250px) - 22px);
-    }
-
-    .nav-arrow.next {
-      left: calc(50% + min(19vw, 250px) - 22px);
-    }
-
-    .nav-arrow svg {
-      width: 24px;
-      height: 12px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.2;
-    }
-
-    @media (max-width: 767px) {
-      .cap-title {
-        font-size: 27px;
-      }
-      .nav-arrow {
-        top: auto;
-        bottom: 118px;
-      }
-      .nav-arrow.prev {
-        left: 16px;
-      }
-      .nav-arrow.next {
-        right: 16px;
-        left: auto;
-      }
-    }
-
-    /* Timeline */
-    #timeline {
-      position: fixed;
-      left: 36px;
-      right: 36px;
-      bottom: 64px;
-      height: 40px;
-      z-index: 25;
-      cursor: pointer;
-    }
-
-    .tl-line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 12px;
-      height: 1px;
-      background: var(--cobalt);
-      opacity: 0.75;
-    }
-
-    .tl-ticks {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 12px;
-      height: 14px;
-      pointer-events: none;
-    }
-
-    .tl-tick {
-      position: absolute;
-      top: 0;
-      width: 1px;
-      background: var(--cobalt);
-      transform: translateX(-50%);
-    }
-
-    .tl-tick.major {
-      height: 13px;
-      opacity: 0.75;
-    }
-
-    .tl-tick.minor {
-      height: 7px;
-      opacity: 0.4;
-    }
-
-    .tl-labels {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 28px;
-      pointer-events: none;
-      font-size: 9.5px;
-      font-weight: 500;
-      color: var(--cobalt);
-    }
-
-    .tl-lbl {
-      position: absolute;
-      transform: translateX(-50%);
-    }
-
-    .tl-lbl.first {
-      transform: none;
-    }
-
-    .tl-lbl.last {
-      transform: translateX(-100%);
-    }
-
-    #tl-dot {
-      position: absolute;
-      top: 8px;
-      left: 0;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--cobalt);
-      transform: translateX(-50%);
-      pointer-events: none;
-      box-shadow: 0 0 0 2px var(--paper);
-    }
-
-    @media (max-width: 767px) {
-      #timeline {
-        left: 16px;
-        right: 16px;
-        bottom: 54px;
-      }
-      .tl-lbl:nth-child(even) {
-        display: none;
-      }
-    }
-
-    /* Footer */
-    footer {
-      position: fixed;
-      left: 36px;
-      right: 36px;
-      bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--cobalt);
-      z-index: 25;
-      pointer-events: none;
-    }
-
-    footer a {
-      pointer-events: auto;
-      transition: opacity 0.2s;
-    }
-
-    footer a:hover {
-      opacity: 0.6;
-    }
-
-    @media (max-width: 767px) {
-      footer {
-        left: 16px;
-        right: 16px;
-        font-size: 9px;
-      }
-    }
-
-    /* Custom Cursor */
+    /* Custom Fluid Whimsical Cursor */
     #cursor {
       position: fixed;
-      width: 58px;
-      height: 58px;
+      width: 40px;
+      height: 40px;
       top: 0;
       left: 0;
       pointer-events: none;
-      z-index: 100;
+      z-index: 1000;
       transform: translate(-50%, -50%);
       display: none;
     }
@@ -549,937 +91,1400 @@
     }
 
     .cur-ring {
-      position: absolute;
-      inset: 0;
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
-      border: 1.5px solid var(--ink);
-      transition: transform 0.5s var(--ease), background 0.4s var(--ease), border-color 0.4s;
-    }
-
-    .cur-dot {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 6px;
-      height: 6px;
-      margin: -3px 0 0 -3px;
-      border-radius: 50%;
-      background: var(--ink);
-      transition: transform 0.4s var(--ease), opacity 0.4s;
-    }
-
-    .cur-lbl {
-      position: absolute;
-      inset: 0;
+      background: var(--lingon);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       color: #FFF;
-      font-weight: 600;
-      font-size: 10px;
-      line-height: 1.1;
-      letter-spacing: 0.1em;
-      opacity: 0;
-      transform: scale(0.6);
-      transition: transform 0.45s var(--ease), opacity 0.4s;
+      font-size: 11px;
+      font-weight: 800;
+      transition: transform 0.3s var(--ease-bounce), background-color 0.25s;
+      box-shadow: 0 8px 24px rgba(217, 56, 41, 0.4);
     }
 
-    #cursor.open .cur-ring {
-      transform: scale(1.75);
+    #cursor.hover .cur-ring {
+      transform: scale(1.6);
       background: var(--cobalt);
-      border-color: var(--cobalt);
-    }
-    #cursor.open .cur-dot {
-      opacity: 0;
-      transform: scale(0);
-    }
-    #cursor.open .cur-lbl {
-      opacity: 1;
-      transform: scale(1);
     }
 
-    #cursor.spine .cur-ring {
-      transform: scale(0.72);
-      border-color: var(--cobalt);
+    #cursor.grab .cur-ring {
+      transform: scale(0.8);
+      background: var(--moss);
     }
 
-    #cursor.btn .cur-ring {
-      transform: scale(0.55);
-      border-color: var(--cobalt);
-    }
-    #cursor.btn .cur-dot {
-      opacity: 0;
-    }
-
-    /* Detail Sheet */
-    #detail {
+    /* INTERFACE LAYER (Above 3D Canvas) */
+    .ui-layer {
       position: fixed;
       inset: 0;
-      background: var(--sheet);
-      z-index: 60;
-      display: none;
-      overflow-y: auto;
-      overflow-x: hidden;
-      clip-path: inset(0 0 0 0);
+      z-index: 30;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 32px;
     }
 
-    .detail-grid {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4vw;
-      padding: 110px 6vw 56px 7vw;
-      align-items: center;
+    .ui-layer a, .ui-layer button, .ui-layer .interactive {
+      pointer-events: auto;
     }
 
-    .detail-close {
-      position: fixed;
-      left: 36px;
-      top: 28px;
-      z-index: 70;
-      color: var(--cobalt);
-      background: var(--sheet);
-    }
-
-    .detail-brand {
-      position: fixed;
-      right: 36px;
-      top: 28px;
-      z-index: 70;
-      color: var(--cobalt);
+    /* Top Bar */
+    header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(250, 247, 240, 0.85);
+      backdrop-filter: blur(16px);
+      padding: 10px 20px;
+      border-radius: 99px;
+      border: 2px solid var(--ink);
+      box-shadow: 4px 4px 0px var(--ink);
+    }
+
+    .logo-text {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      color: var(--ink);
+      transition: color 0.2s;
+    }
+
+    .logo-text:hover {
+      color: var(--lingon);
+    }
+
+    .badge-nordic {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: var(--butter);
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid var(--ink);
+    }
+
+    /* Camera Hotspots & Sound Pills */
+    .nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(250, 247, 240, 0.9);
+      backdrop-filter: blur(16px);
+      padding: 10px 18px;
+      border-radius: 99px;
+      border: 2px solid var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 3px 3px 0px var(--ink);
+      transition: transform 0.2s var(--ease-bounce), background-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .pill-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px var(--ink);
+      background: var(--butter);
+    }
+
+    .pill-btn.active {
+      background: var(--lingon);
+      color: #FFF;
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .bag-btn {
+      background: var(--lingon);
+      color: #FFF;
+    }
+    .bag-btn:hover {
+      background: var(--lingon-bright);
+    }
+
+    @media (max-width: 820px) {
+      .nav-pills .tour-pill {
+        display: none;
+      }
+      .ui-layer {
+        padding: 16px;
+      }
+    }
+
+    /* Sound indicator bars */
+    .sound-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 16px;
+    }
+
+    .sound-bar {
+      width: 3px;
+      background: currentColor;
+      border-radius: 1px;
+      height: 4px;
+      transition: height 0.2s;
+    }
+
+    body.sound-on .sound-bar:nth-child(1) { animation: s-bar 0.5s infinite alternate; }
+    body.sound-on .sound-bar:nth-child(2) { animation: s-bar 0.7s 0.15s infinite alternate; }
+    body.sound-on .sound-bar:nth-child(3) { animation: s-bar 0.4s 0.3s infinite alternate; }
+
+    @keyframes s-bar {
+      0% { height: 3px; }
+      100% { height: 16px; }
+    }
+
+    /* Bottom HUD: Atmosphere Selector & Navigation Hints */
+    .bottom-hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 100%;
       gap: 16px;
     }
 
-    .detail-left {
-      max-width: 520px;
+    .atmosphere-bar {
       display: flex;
-      flex-direction: column;
-      gap: 18px;
+      align-items: center;
+      gap: 8px;
+      background: rgba(250, 247, 240, 0.9);
+      backdrop-filter: blur(16px);
+      padding: 6px 10px;
+      border-radius: 99px;
+      border: 2px solid var(--ink);
+      box-shadow: 4px 4px 0px var(--ink);
     }
 
-    .detail-line {
-      overflow: hidden;
+    .atmo-btn {
+      padding: 8px 14px;
+      border-radius: 99px;
+      border: 1.5px solid transparent;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s var(--ease-bounce);
+      cursor: pointer;
     }
 
-    .detail-sub {
-      color: var(--cobalt);
-      letter-spacing: 0.24em;
+    .atmo-btn.active {
+      background: var(--ink);
+      color: #FFF;
+      border-color: var(--ink);
     }
 
-    .detail-title {
-      font-family: "Inter Tight", sans-serif;
+    .instruction-card {
+      background: rgba(250, 247, 240, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 10px 18px;
+      border-radius: 99px;
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0px var(--ink);
+      font-size: 11px;
       font-weight: 600;
-      font-size: clamp(44px, 5.2vw, 80px);
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      color: var(--cobalt);
-    }
-
-    .detail-meta {
-      color: var(--muted);
-      font-weight: 500;
-      font-size: 11.5px;
-      letter-spacing: 0.12em;
-    }
-
-    .detail-synopsis {
-      font-family: "Newsreader", Georgia, serif;
-      font-size: 17px;
-      line-height: 1.5;
-      color: var(--ink);
-      max-width: 42ch;
-    }
-
-    .detail-credit {
-      font-family: "Newsreader", Georgia, serif;
-      font-style: italic;
-      font-size: 14.5px;
-      color: var(--muted);
-    }
-
-    .detail-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 44px;
-      padding: 0 28px;
-      border: 1px solid var(--cobalt);
-      color: var(--cobalt);
-      margin-top: 12px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .detail-btn:hover {
-      background: var(--cobalt);
-      color: var(--sheet);
-    }
-
-    .detail-right {
+      color: var(--bark);
       display: flex;
-      justify-content: center;
       align-items: center;
+      gap: 8px;
     }
 
-    .detail-poster-svg {
-      width: 100%;
-      max-width: 420px;
-      height: min(100%, 78vh);
-      filter: drop-shadow(0 20px 40px rgba(20, 16, 10, 0.25));
-    }
-
-    @media (max-width: 767px) {
-      .detail-grid {
-        grid-template-columns: 1fr;
-        padding: 80px 20px 40px;
-        gap: 24px;
-      }
-      .detail-right {
-        order: -1;
-      }
-      .detail-poster-svg {
-        max-height: 46svh;
-      }
-      .detail-title {
-        font-size: 42px;
-      }
-      .detail-close {
-        left: 16px;
-        top: 20px;
-      }
-      .detail-brand {
+    @media (max-width: 768px) {
+      .instruction-card {
         display: none;
       }
+      .bottom-hud {
+        justify-content: center;
+      }
+    }
+
+    /* 3D OBJECT FOCUS INSPECTOR SHEET (Pops up when an object is clicked in 3D) */
+    #object-inspector {
+      position: fixed;
+      bottom: 100px;
+      left: 32px;
+      z-index: 50;
+      width: min(380px, calc(100vw - 64px));
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 8px 8px 0px var(--ink);
+      transform: translateY(140%) scale(0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.5s var(--ease-bounce), opacity 0.4s var(--ease-smooth);
+    }
+
+    #object-inspector.active {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .insp-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      background: var(--bone);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .insp-close:hover {
+      background: var(--butter);
+    }
+
+    .insp-badge {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--moss);
+      background: var(--bone);
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .insp-title {
+      font-family: 'Fraunces', serif;
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    .insp-sub {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--lingon);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    .insp-desc {
+      font-size: 13px;
+      color: var(--bark);
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .insp-meta {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1.5px dashed var(--ink);
+      font-size: 11px;
+      color: var(--bark);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .insp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+
+    .insp-price {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .adopt-btn {
+      background: var(--lingon);
+      color: #FFF;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 12px 24px;
+      border-radius: 99px;
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0px var(--ink);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-bounce);
+    }
+
+    .adopt-btn:hover {
+      background: var(--lingon-bright);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px var(--ink);
+    }
+
+    /* SLIDE-OVER BAG DRAWER */
+    #cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(440px, 100vw);
+      background: var(--paper);
+      border-left: 3px solid var(--ink);
+      z-index: 200;
+      transform: translateX(105%);
+      transition: transform 0.45s var(--ease-smooth);
+      box-shadow: -15px 0 45px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #cart-drawer.open {
+      transform: translateX(0);
+    }
+
+    .cart-head {
+      padding: 24px;
+      background: var(--butter);
+      border-bottom: 2px solid var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 14px;
+      padding: 16px;
+      background: #FFF;
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .cart-foot {
+      padding: 24px;
+      border-top: 2px solid var(--ink);
+      background: #FFF;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 99px;
+      border: 3px solid var(--ink);
+      background: var(--lingon);
+      color: #FFF;
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      box-shadow: 4px 4px 0px var(--ink);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-bounce);
+    }
+
+    .checkout-btn:hover {
+      background: var(--lingon-bright);
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--ink);
+    }
+
+    /* Intro Loading Screen */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #FAF7F0;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+
+    #loader.gone {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--butter);
+      border-top-color: var(--lingon);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
+  <!-- Three.js (r128 via Cloudflare CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-  <!-- Paper Grain SVG Filter -->
-  <svg id="grain" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fullscreen Three.js WebGL Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Paper Grain Layer -->
+  <svg id="paper-grain" xmlns="http://www.w3.org/2000/svg">
     <filter id="grainFilter">
-      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" />
-      <feColorMatrix values="0 0 0 0 0.45   0 0 0 0 0.42   0 0 0 0 0.38   0 0 0 0.22 0" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix values="0 0 0 0 0.35   0 0 0 0 0.32   0 0 0 0 0.28   0 0 0 0 0.22 0" />
     </filter>
     <rect width="100%" height="100%" filter="url(#grainFilter)" />
   </svg>
 
-  <!-- SVG Filter for Poster Ink Bleed -->
-  <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
-    <defs>
-      <filter id="inkDisplacement" x="-20%" y="-20%" width="140%" height="140%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="7" result="noise" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="120" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-    </defs>
-  </svg>
-
-  <!-- Top Bar -->
-  <header>
-    <div class="brand-left">
-      <a href="#" class="lbl">LEON VASARI</a>
-      <span class="brand-line"></span>
-      <span class="lbl">FILM ARCHIVE</span>
-    </div>
-    <nav class="nav-right" aria-label="Main Navigation">
-      <div class="nav-links" style="display: flex; gap: 34px;">
-        <a href="#shelf" class="lbl">FILMS</a>
-        <a href="#about" class="lbl">ABOUT</a>
-        <a href="#journal" class="lbl">JOURNAL</a>
-      </div>
-      <button class="burger" aria-label="Menu">
-        <span></span>
-        <span></span>
-      </button>
-    </nav>
-  </header>
-
-  <!-- Halftone Kanji Background -->
-  <div class="kanji kanji-left" aria-hidden="true">映画</div>
-  <div class="kanji kanji-right" aria-hidden="true">の記憶</div>
-
-  <!-- Floor Shadow -->
-  <div id="floor-shadow" aria-hidden="true"></div>
-
-  <!-- 3D VHS Arc Shelf -->
-  <section id="shelf" aria-label="VHS Film Shelf">
-    <div class="stage" id="stage"></div>
-  </section>
-
-  <!-- Play Ring -->
-  <div id="play-ring" aria-hidden="true">
-    <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21" /></svg>
-  </div>
-
-  <!-- Caption Area -->
-  <section id="caption" aria-live="polite">
-    <div class="mask-wrap"><div class="cap-title" id="cap-title">Noon in Ashes</div></div>
-    <div class="mask-wrap"><div class="cap-sub lbl" id="cap-sub">HAI NO SHOGO / 灰の正午</div></div>
-    <div class="cap-rule"></div>
-    <div class="mask-wrap"><div class="cap-year" id="cap-year">1971 — WESTERN</div></div>
-  </section>
-
-  <!-- Navigation Arrows -->
-  <button class="nav-arrow prev" id="btn-prev" aria-label="Previous film">
-    <svg viewBox="0 0 24 12"><path d="M6 1L1 6l5 5M1 6h23" /></svg>
-  </button>
-  <button class="nav-arrow next" id="btn-next" aria-label="Next film">
-    <svg viewBox="0 0 24 12"><path d="M18 1l5 5-5 5M23 6H0" /></svg>
-  </button>
-
-  <!-- Timeline -->
-  <nav id="timeline" aria-label="Film Timeline">
-    <div class="tl-line"></div>
-    <div class="tl-ticks" id="tl-ticks"></div>
-    <div class="tl-labels" id="tl-labels"></div>
-    <div id="tl-dot"></div>
-  </nav>
-
-  <!-- Footer -->
-  <footer>
-    <div class="lbl">© LEON VASARI. ALL RIGHTS RESERVED.</div>
-    <div class="lbl" style="display: flex; gap: 12px;">
-      <a href="#">FB</a>
-      <span>/</span>
-      <a href="#">TW</a>
-    </div>
-  </footer>
-
-  <!-- Custom Cursor -->
+  <!-- Custom Fluid Cursor -->
   <div id="cursor">
-    <div class="cur-ring"></div>
-    <div class="cur-dot"></div>
-    <div class="cur-lbl">
-      <span>OPEN</span>
-      <span style="font-size: 8px;">開く</span>
+    <div class="cur-ring" id="cur-ring">✦</div>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="loader-spinner"></div>
+    <p class="font-serif" style="margin-top: 20px; font-size: 24px; font-weight: 800; font-style: italic;">
+      Välkommen till Reum...
+    </p>
+    <p style="font-size: 12px; color: var(--bark); margin-top: 6px;">Entering 3D Swedish Dream Room</p>
+  </div>
+
+  <!-- INTERFACE HUD (Fixed Above 3D Scene) -->
+  <div class="ui-layer">
+    
+    <!-- Top Header -->
+    <header>
+      <div class="logo-container">
+        <a href="#" class="logo-text">Reum</a>
+        <span class="badge-nordic">Sverige</span>
+      </div>
+
+      <!-- Navigation Hotspots & Bag -->
+      <div class="nav-pills">
+        <button class="pill-btn tour-pill active" onclick="flyToWaypoint('overview')">✦ Översikt</button>
+        <button class="pill-btn tour-pill" onclick="flyToWaypoint('table')">🍞 Duka (Table)</button>
+        <button class="pill-btn tour-pill" onclick="flyToWaypoint('candles')">🕯️ Ljus (Hearth)</button>
+        <button class="pill-btn tour-pill" onclick="flyToWaypoint('window')">🌿 Solrum</button>
+
+        <button class="pill-btn" id="sound-btn" onclick="toggleAudio()">
+          <span>📻 Fika Radio</span>
+          <div class="sound-bars">
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+          </div>
+        </button>
+
+        <button class="pill-btn bag-btn" onclick="toggleCart(true)">
+          <span>Bag</span>
+          <span id="bag-count" style="background:#FFF; color:var(--ink); padding:2px 7px; border-radius:99px; font-size:11px;">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Controls & Atmosphere Switcher -->
+    <div class="bottom-hud">
+      
+      <!-- Atmosphere Switcher -->
+      <div class="atmosphere-bar">
+        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; padding-left: 6px; color: var(--bark);">Ljus:</span>
+        <button class="atmo-btn active" onclick="setLightingMode('morning')" id="atmo-morning">
+          <span>🌅</span><span>Morgonsol</span>
+        </button>
+        <button class="atmo-btn" onclick="setLightingMode('fika')" id="atmo-fika">
+          <span>☕</span><span>Fikastund</span>
+        </button>
+        <button class="atmo-btn" onclick="setLightingMode('midnight')" id="atmo-midnight">
+          <span>🌌</span><span>Midnattssol</span>
+        </button>
+      </div>
+
+      <!-- Interactive Help Instructions -->
+      <div class="instruction-card">
+        <span>✦ Drag to explore · Scroll to zoom · Click any 3D object to inspect</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 3D OBJECT FOCUS INSPECTION CARD -->
+  <div id="object-inspector">
+    <button class="insp-close" onclick="closeInspector()">✕</button>
+    <span class="insp-badge" id="insp-category">Bord & Fika</span>
+    <h3 class="insp-title" id="insp-title">The Wiggle Butter Dish</h3>
+    <p class="insp-sub" id="insp-subtitle">Smörask med vågkant</p>
+    <p class="insp-desc" id="insp-desc">
+      Glazed earthenware crock with an undulating wavy rim and mushroom knob. Handcrafted for unhurried Swedish morning breakfasts.
+    </p>
+
+    <div class="insp-meta">
+      <div><strong>Provenance:</strong> <span id="insp-provenance">Alcobaça, Portugal</span></div>
+      <div><strong>Material:</strong> <span id="insp-material">High-fire earthenware, food-safe glaze</span></div>
+      <div><strong>Dimensions:</strong> <span id="insp-dimensions">14cm L × 10cm W × 8.5cm H</span></div>
+    </div>
+
+    <div class="insp-row">
+      <span class="insp-price" id="insp-price">$58</span>
+      <button class="adopt-btn" id="insp-add-btn">Adopt to Bag +</button>
     </div>
   </div>
 
-  <!-- Detail Sheet -->
-  <div id="detail" role="dialog" aria-modal="true" aria-label="Film Details">
-    <button class="lbl box detail-close" id="detail-close" aria-label="Close detail sheet">
-      CLOSE / 閉じる
-    </button>
-    <div class="detail-brand lbl">
-      <span>LEON VASARI</span>
-      <span style="width: 30px; height: 1px; background: currentColor;"></span>
-      <span>FILM ARCHIVE</span>
+  <!-- CART SLIDE-OVER DRAWER -->
+  <aside id="cart-drawer" aria-label="Shopping Bag">
+    <div class="cart-head">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:24px;">🛍️</span>
+        <h3 class="font-serif" style="font-size:24px; font-weight:900;">Your Reum Bag</h3>
+      </div>
+      <button onclick="toggleCart(false)" style="font-size: 24px; font-weight: 800; cursor:pointer;">✕</button>
     </div>
 
-    <div class="detail-grid">
-      <!-- Left Column: Story & Meta -->
-      <div class="detail-left">
-        <div class="detail-line"><div class="lbl detail-sub" id="det-sub">HAI NO SHOGO / 灰の正午</div></div>
-        <div class="detail-line"><h2 class="detail-title" id="det-title">Noon in Ashes</h2></div>
-        <div class="detail-line"><div class="detail-meta" id="det-meta">1971 / WESTERN / 112 MIN</div></div>
-        <div class="detail-line"><p class="detail-synopsis" id="det-synopsis">A rider crosses a white desert to settle an old debt, and learns too late who sent him.</p></div>
-        <div class="detail-line"><p class="detail-credit">Written and directed by Leon Vasari. 監督作品</p></div>
-        <div class="detail-line">
-          <button class="lbl detail-btn">WATCH THE FILM / 映画を見る</button>
-        </div>
-      </div>
-
-      <!-- Right Column: Ink Bleed Poster -->
-      <div class="detail-right">
-        <svg class="detail-poster-svg" viewBox="0 0 474 900">
-          <defs>
-            <clipPath id="inkMask">
-              <g filter="url(#inkDisplacement)">
-                <circle id="ic0" cx="150" cy="330" r="0" fill="#fff" />
-                <circle id="ic1" cx="340" cy="600" r="0" fill="#fff" />
-                <circle id="ic2" cx="250" cy="120" r="0" fill="#fff" />
-                <circle id="ic3" cx="90"  cy="760" r="0" fill="#fff" />
-                <circle id="ic4" cx="400" cy="250" r="0" fill="#fff" />
-                <circle id="ic5" cx="260" cy="860" r="0" fill="#fff" />
-                <circle id="ic6" cx="230" cy="470" r="0" fill="#fff" />
-              </g>
-            </clipPath>
-          </defs>
-          <image id="detail-poster-img" x="0" y="0" width="474" height="900" preserveAspectRatio="none" clip-path="url(#inkMask)" />
-        </svg>
-      </div>
+    <div class="cart-items" id="cart-items">
+      <!-- Items dynamically populated -->
     </div>
-  </div>
 
+    <div class="cart-foot">
+      <div style="display:flex; justify-content:space-between; font-weight:800; font-size:18px;">
+        <span>Subtotal:</span>
+        <span id="cart-subtotal">$0 USD</span>
+      </div>
+      <p style="font-size:11px; color:var(--bark);">
+        ✦ Seed paper unboxing note & plastic-free packaging included.
+      </p>
+      <button class="checkout-btn" onclick="triggerCheckout()">
+        Proceed to Checkout →
+      </button>
+    </div>
+  </aside>
+
+  <!-- THREE.JS 3D EXPERIENTIAL SCENE SCRIPT -->
   <script>
-    (function () {
+    (function() {
       'use strict';
 
-      // ─── Image Sheets & Crop Coordinates ───
-      const SHEETS = {
-        covers: ['https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261029_010644_837e04ca-2418-45c1-b8e0-0233265c4cd5.png&w=1744&q=85', 1744, 2336],
-        spines: ['https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261029_010738_a3e47ead-18f2-4974-9468-06d16a25edc5.png&w=2688&q=85', 2688, 1152],
-        fix:    ['https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261029_010831_3ebb874b-93dc-433e-87ed-6299aba720f0.png&w=1520&q=85', 1520, 2688],
-        fix2:   ['https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261029_092020_f96bc094-db7b-46de-9298-074a24e0a3b8.png&w=1520&q=85', 1520, 2688],
+      // ─── 1. Product Catalog Data ───
+      const PRODUCTS = {
+        butter: {
+          id: 'butter',
+          name: 'The Wiggle Butter Dish',
+          subtitle: 'Smörask med vågkant',
+          category: 'Duka · Portugal',
+          price: 58,
+          provenance: 'Handmade in Alcobaça, Portugal',
+          material: 'High-fire glazed earthenware',
+          dimensions: '14cm L × 10cm W × 8.5cm H',
+          desc: 'An iconic ceramic butter dish with an undulating wiggle rim and spherical mushroom knob.',
+          img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=300&q=80',
+          cameraPos: { x: -1.2, y: 2.1, z: 2.2 },
+          targetPos: { x: -1.2, y: 1.45, z: 0.5 },
+        },
+        candlestick: {
+          id: 'candlestick',
+          name: 'Krumelur Twist Candlestick',
+          subtitle: 'Tvilling-ljusstake',
+          category: 'Ljus · Portugal',
+          price: 64,
+          provenance: 'Cast in Caldas da Rainha, Portugal',
+          material: 'Matte-finish speckled ceramic stoneware',
+          dimensions: '19cm H × 14cm W',
+          desc: 'Asymmetric twin spiral ceramic candlestick holding hand-dipped Swedish beeswax tapers.',
+          img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=300&q=80',
+          cameraPos: { x: 0.2, y: 2.4, z: 2.0 },
+          targetPos: { x: 0.2, y: 1.6, z: 0.3 },
+        },
+        lamp: {
+          id: 'lamp',
+          name: 'Bobbin Turned Birch Lamp',
+          subtitle: 'Svarvad bordslampa med plissering',
+          category: 'Ljus · Småland',
+          price: 165,
+          provenance: 'Turned in Småland, Sweden',
+          material: 'FSC Scandinavian Birch, pleated cotton shade',
+          dimensions: '42cm H × 26cm Shade Diameter',
+          desc: 'Spindle-turned solid birch lamp base paired with a pleated blue gingham empire shade.',
+          img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&q=80',
+          cameraPos: { x: 2.1, y: 2.8, z: 2.2 },
+          targetPos: { x: 1.8, y: 1.9, z: 0.2 },
+        },
+        mug: {
+          id: 'mug',
+          name: 'The Fika Loop Mug',
+          subtitle: 'Kopp för fikastunder',
+          category: 'Duka · Alcobaça',
+          price: 38,
+          provenance: 'Thrown in Alcobaça, Portugal',
+          material: 'Dense culinary stoneware with butter glaze',
+          dimensions: '360ml capacity, 9cm diameter',
+          desc: 'Chunky handmade fika mug with an oversized circular ring handle and warm buttercup glaze.',
+          img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80',
+          cameraPos: { x: -0.4, y: 2.0, z: 2.1 },
+          targetPos: { x: -0.4, y: 1.45, z: 0.6 },
+        },
+        matchbox: {
+          id: 'matchbox',
+          name: 'Trollskogen Cast Brass Box',
+          subtitle: 'Mässingsfodral för tändstickor',
+          category: 'Småsaker · Moradabad',
+          price: 48,
+          provenance: 'Sand-cast in solid unlacquered brass',
+          material: '100% Solid Brass (develops rich patina)',
+          dimensions: '11.5cm L × 6.5cm W',
+          desc: 'Heavy cast brass matchbox cover embossed with whimsical Swedish forest flora.',
+          img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=300&q=80',
+          cameraPos: { x: 0.9, y: 1.9, z: 2.0 },
+          targetPos: { x: 0.85, y: 1.45, z: 0.5 },
+        }
       };
 
-      // Preload sheets
-      Object.values(SHEETS).forEach(([url]) => {
-        const img = new Image();
-        img.src = url;
+      // ─── 2. Camera Waypoints ───
+      const WAYPOINTS = {
+        overview: { pos: { x: 0, y: 3.8, z: 5.6 }, target: { x: 0, y: 1.2, z: 0 } },
+        table:    { pos: { x: -0.8, y: 2.4, z: 2.8 }, target: { x: -0.4, y: 1.4, z: 0.4 } },
+        candles:  { pos: { x: 0.3, y: 2.3, z: 2.0 }, target: { x: 0.2, y: 1.6, z: 0.3 } },
+        window:   { pos: { x: 2.6, y: 2.8, z: 3.4 }, target: { x: 1.5, y: 1.8, z: -0.5 } }
+      };
+
+      let currentCamPos = { ...WAYPOINTS.overview.pos };
+      let targetCamPos = { ...WAYPOINTS.overview.pos };
+      let currentLookAt = { ...WAYPOINTS.overview.target };
+      let targetLookAt = { ...WAYPOINTS.overview.target };
+
+      // ─── 3. Three.js Scene Setup ───
+      const canvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xF4EFE6);
+      scene.fog = new THREE.FogExp2(0xF4EFE6, 0.045);
+
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 50);
+      camera.position.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
+      camera.lookAt(currentLookAt.x, currentLookAt.y, currentLookAt.z);
+
+      // ─── 4. Lighting System ───
+      const ambientLight = new THREE.AmbientLight(0xFFF9EE, 0.9);
+      scene.add(ambientLight);
+
+      const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xEDE2D0, 0.6);
+      scene.add(hemiLight);
+
+      const sunLight = new THREE.DirectionalLight(0xFFF3D6, 1.8);
+      sunLight.position.set(6, 8, 4);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
+      sunLight.shadow.bias = -0.0005;
+      scene.add(sunLight);
+
+      // Candle Flame Lights (PointLights that flicker)
+      const candleLight1 = new THREE.PointLight(0xFFA500, 0.9, 3.5);
+      candleLight1.position.set(0.12, 1.95, 0.3);
+      scene.add(candleLight1);
+
+      const candleLight2 = new THREE.PointLight(0xFFA500, 0.9, 3.5);
+      candleLight2.position.set(0.28, 1.95, 0.3);
+      scene.add(candleLight2);
+
+      // ─── 5. Room Architecture ───
+
+      // Procedural Checkerboard Floor Canvas Texture (Terracotta & Oatmeal)
+      function createFloorTexture() {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 512;
+        const ctx = c.getContext('2d');
+        const size = 64;
+        for (let x = 0; x < 512; x += size) {
+          for (let y = 0; y < 512; y += size) {
+            const isDark = ((x / size) + (y / size)) % 2 === 0;
+            ctx.fillStyle = isDark ? '#C76A58' : '#FAF5EC';
+            ctx.fillRect(x, y, size, size);
+          }
+        }
+        const tex = new THREE.CanvasTexture(c);
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(12, 12);
+        return tex;
+      }
+
+      const floorGeo = new THREE.PlaneGeometry(30, 30);
+      const floorMat = new THREE.MeshStandardMaterial({
+        map: createFloorTexture(),
+        roughness: 0.65,
+        metalness: 0.05,
+      });
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      // Back Wall with Arch Window Cutout
+      const wallMat = new THREE.MeshStandardMaterial({
+        color: 0xFDFBF7,
+        roughness: 0.9,
+      });
+      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(30, 14), wallMat);
+      backWall.position.set(0, 7, -5);
+      backWall.receiveShadow = true;
+      scene.add(backWall);
+
+      // Arched Window Frame with Nordic Forest View
+      const windowGroup = new THREE.Group();
+      windowGroup.position.set(1.5, 4.5, -4.95);
+
+      const windowGlass = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.2, 4.8),
+        new THREE.MeshBasicMaterial({ color: 0xDDF0FF, opacity: 0.6, transparent: true })
+      );
+      windowGroup.add(windowGlass);
+
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x4A3728, roughness: 0.7 });
+      const mullionV = new THREE.Mesh(new THREE.BoxGeometry(0.08, 4.8, 0.08), frameMat);
+      const mullionH = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.08, 0.08), frameMat);
+      windowGroup.add(mullionV);
+      windowGroup.add(mullionH);
+      scene.add(windowGroup);
+
+      // Large Solid Scandinavian Timber Dining Table
+      const tableGroup = new THREE.Group();
+      tableGroup.position.set(0, 0, 0);
+
+      const woodMat = new THREE.MeshStandardMaterial({
+        color: 0xE4C9A2,
+        roughness: 0.5,
+        metalness: 0.05,
       });
 
-      const FILMS = [
-        { id: 'valley',   title: 'The Silent Valley', romaji: 'SHIZUKANA TANI', kanji: '静かな谷', year: 1958, genre: 'Drama',    min: 104, synopsis: 'A schoolteacher returns to the mountain village that exiled her father, and finds the valley has kept every one of its secrets.', spine: ['spines', 266, 31, 189, 1089],  cover: ['covers', 497, 72, 344, 659] },
-        { id: 'bluehour', title: 'The Blue Hour',     romaji: 'AO NO TOKI',     kanji: '青の刻',   year: 1962, genre: 'Romance',  min: 97,  synopsis: 'Over one long evening in a harbour town, a widow and a stranger trade small lies until the light runs out.',                      spine: ['spines', 492, 31, 189, 1089],  cover: ['covers', 914, 72, 342, 659] },
-        { id: 'river',    title: 'River of Salt',     romaji: 'SHIO NO KAWA',   kanji: '塩の川',   year: 1964, genre: 'Drama',    min: 121, synopsis: 'Two brothers drag a salt barge downriver to a city that no longer wants anything they carry.',                                spine: ['fix',    197, 54, 324, 2566],  cover: ['covers', 1332, 72, 344, 659] },
-        { id: 'summer',   title: 'The Last Summer',   romaji: 'SAIGO NO NATSU', kanji: '最後の夏', year: 1966, genre: 'Drama',    min: 109, synopsis: 'The summer before the dam floods their village, three friends set fire to everything they cannot take with them.',             spine: ['spines', 937, 31, 188, 1089],  cover: ['covers', 74, 813, 344, 676] },
-        { id: 'green',    title: 'The Green Road',    romaji: 'MIDORI NO MICHI',kanji: '緑の道',   year: 1969, genre: 'Mystery',  min: 101, synopsis: 'A surveyor mapping a forest road keeps finding the same footprints, always one day ahead of him.',                             spine: ['spines', 1157, 31, 185, 1090], cover: ['covers', 497, 815, 344, 674] },
-        { id: 'noon',     title: 'Noon in Ashes',     romaji: 'HAI NO SHOGO',   kanji: '灰の正午', year: 1971, genre: 'Western',  min: 112, synopsis: 'A rider crosses a white desert to settle an old debt, and learns too late who sent him.',                                       spine: ['spines', 44, 32, 184, 1088],   cover: ['covers', 74, 72, 347, 659] },
-        { id: 'observer', title: 'The Observer',      romaji: 'KANSATSUSHA',    kanji: '観察者',   year: 1973, genre: 'Thriller', min: 96,  synopsis: 'A night watchman begins to suspect that the building he guards has started watching him back.',                                         spine: ['fix2',   371, 15, 349, 2655],  cover: ['covers', 915, 815, 342, 675] },
-        { id: 'birds',    title: 'The Fallen Birds',  romaji: 'OCHITA TORI',    kanji: '落ちた鳥', year: 1975, genre: 'Drama',    min: 118, synopsis: 'When the birds stop singing over a frontier town, the mayor’s daughter is the only one who goes looking for the reason.',         spine: ['spines', 1573, 31, 183, 1089], cover: ['covers', 1331, 815, 345, 675] },
-        { id: 'storm',    title: 'Light in the Storm',romaji: 'ARASHI NO HI',   kanji: '嵐の灯',   year: 1978, genre: 'Drama',    min: 127, synopsis: 'A lighthouse keeper and his son wait out a three-day storm with a shipwrecked sailor who will not give his name.',             spine: ['fix2',   808, 15, 347, 2656],  cover: ['covers', 74, 1571, 345, 681] },
-        { id: 'tide',     title: 'The Long Tide',     romaji: 'NAGAI SHIO',     kanji: '長い潮',   year: 1981, genre: 'Drama',    min: 99,  synopsis: 'A fisherman’s wife counts the tides on the harbour wall while her husband’s boat fails to come home.',                                  spine: ['spines', 2012, 31, 188, 1089], cover: ['covers', 496, 1577, 343, 678] },
-        { id: 'war',      title: 'A Quiet War',       romaji: 'SHIZUKANA SENSO',kanji: '静かな戦争',year: 1985, genre: 'Comedy',   min: 103, synopsis: 'Two neighbours fight a silent war over a garden wall for thirty years, and neither will say how it began.',                    spine: ['spines', 2236, 31, 189, 1089], cover: ['covers', 913, 1579, 343, 676] },
-        { id: 'door',     title: 'Red Door',          romaji: 'AKAI TOBIRA',    kanji: '赤い扉',   year: 1989, genre: 'Thriller', min: 114, synopsis: 'A projectionist follows a reel of unknown film through the corridors of a cinema on its final night.',                         spine: ['spines', 2462, 31, 188, 1089], cover: ['covers', 1331, 1579, 344, 677] }
+      // Table Top (Rounded Chamfer Box)
+      const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.12, 2.2), woodMat);
+      tableTop.position.set(0, 1.35, 0.3);
+      tableTop.receiveShadow = true;
+      tableTop.castShadow = true;
+      tableGroup.add(tableTop);
+
+      // 4 Turned Timber Legs
+      const legPositions = [
+        [-2.1, 0.67, -0.6],
+        [2.1, 0.67, -0.6],
+        [-2.1, 0.67, 1.2],
+        [2.1, 0.67, 1.2],
       ];
+      legPositions.forEach(([x, y, z]) => {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 1.35, 16), woodMat);
+        leg.position.set(x, y, z);
+        leg.castShadow = true;
+        tableGroup.add(leg);
+      });
+      scene.add(tableGroup);
 
-      function getCropCSS(crop) {
-        const [sheetKey, x, y, w, h] = crop;
-        const [url, W, H] = SHEETS[sheetKey];
-        const sizeX = (W / w) * 100;
-        const sizeY = (H / h) * 100;
-        const posX = (x / (W - w)) * 100;
-        const posY = (y / (H - h)) * 100;
-        return `background-image: url('${url}'); background-size: ${sizeX}% ${sizeY}%; background-position: ${posX}% ${posY}%;`;
+      // ─── 6. Interactive 3D Homeware Models ───
+      const interactiveMeshes = [];
+
+      // HELPER: Register an interactive object with bounding box for raycasting
+      function registerProduct(mesh, productKey) {
+        mesh.userData.productKey = productKey;
+        interactiveMeshes.push(mesh);
       }
 
-      function smoothstep(t) {
-        const x = Math.max(0, Math.min(1, t));
-        return x * x * (3 - 2 * x);
+      // MODEL 1: The Wiggle Butter Dish (Ceramic Crock)
+      const butterGroup = new THREE.Group();
+      butterGroup.position.set(-1.2, 1.41, 0.5);
+
+      const butterYellowMat = new THREE.MeshStandardMaterial({
+        color: 0xFEE78A,
+        roughness: 0.25,
+        metalness: 0.08,
+      });
+      const lingonRedMat = new THREE.MeshStandardMaterial({
+        color: 0xD93829,
+        roughness: 0.25,
+        metalness: 0.08,
+      });
+
+      // Base Crock
+      const crockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.28, 0.16, 32), butterYellowMat);
+      crockBase.position.y = 0.08;
+      crockBase.castShadow = true;
+      crockBase.receiveShadow = true;
+      butterGroup.add(crockBase);
+
+      // Wiggle Lid
+      const crockLid = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.33, 0.12, 32), lingonRedMat);
+      crockLid.position.y = 0.22;
+      crockLid.castShadow = true;
+      butterGroup.add(crockLid);
+
+      // Mushroom Knob
+      const knob = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), butterYellowMat);
+      knob.position.y = 0.32;
+      knob.scale.set(1.2, 0.8, 1.2);
+      butterGroup.add(knob);
+
+      scene.add(butterGroup);
+      registerProduct(crockBase, 'butter');
+      registerProduct(crockLid, 'butter');
+
+      // MODEL 2: Krumelur Twin Twist Candlestick + Beeswax Tapers + Flames
+      const candleGroup = new THREE.Group();
+      candleGroup.position.set(0.2, 1.41, 0.3);
+
+      const ceramicMossMat = new THREE.MeshStandardMaterial({
+        color: 0x2A4832,
+        roughness: 0.4,
+        metalness: 0.05,
+      });
+      const beeswaxMat = new THREE.MeshStandardMaterial({
+        color: 0xFFDC73,
+        roughness: 0.3,
+      });
+      const flameMat = new THREE.MeshBasicMaterial({ color: 0xFF9900 });
+
+      // Curved Ceramic Twin Stems
+      const stem1 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.04, 16, 32, Math.PI), ceramicMossMat);
+      stem1.rotation.z = Math.PI / 2;
+      stem1.position.set(-0.08, 0.22, 0);
+      stem1.castShadow = true;
+      candleGroup.add(stem1);
+
+      const stem2 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.04, 16, 32, Math.PI), ceramicMossMat);
+      stem2.rotation.z = -Math.PI / 2;
+      stem2.position.set(0.08, 0.22, 0);
+      stem2.castShadow = true;
+      candleGroup.add(stem2);
+
+      const candleBase = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.05, 32), ceramicMossMat);
+      candleBase.position.y = 0.025;
+      candleGroup.add(candleBase);
+
+      // Two Tapers
+      const taper1 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.025, 0.45, 16), beeswaxMat);
+      taper1.position.set(-0.08, 0.45, 0);
+      taper1.castShadow = true;
+      candleGroup.add(taper1);
+
+      const taper2 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.025, 0.45, 16), beeswaxMat);
+      taper2.position.set(0.08, 0.45, 0);
+      taper2.castShadow = true;
+      candleGroup.add(taper2);
+
+      // Animated Flame Meshes
+      const flameMesh1 = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.07, 8), flameMat);
+      flameMesh1.position.set(-0.08, 0.71, 0);
+      candleGroup.add(flameMesh1);
+
+      const flameMesh2 = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.07, 8), flameMat);
+      flameMesh2.position.set(0.08, 0.71, 0);
+      candleGroup.add(flameMesh2);
+
+      scene.add(candleGroup);
+      registerProduct(candleBase, 'candlestick');
+      registerProduct(taper1, 'candlestick');
+      registerProduct(taper2, 'candlestick');
+
+      // MODEL 3: Bobbin Turned Birch Lamp
+      const lampGroup = new THREE.Group();
+      lampGroup.position.set(1.8, 1.41, 0.2);
+
+      const birchMat = new THREE.MeshStandardMaterial({ color: 0xF3DFC4, roughness: 0.6 });
+      const shadeMat = new THREE.MeshStandardMaterial({ color: 0xFAF6EB, roughness: 0.8 });
+
+      // Spindle Bobbin Spheres
+      for (let i = 0; i < 4; i++) {
+        const bobbin = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), birchMat);
+        bobbin.position.y = 0.08 + i * 0.12;
+        bobbin.castShadow = true;
+        lampGroup.add(bobbin);
       }
+      const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.06, 32), birchMat);
+      lampBase.position.y = 0.03;
+      lampGroup.add(lampBase);
 
-      // ─── DOM Elements ───
-      const stage = document.getElementById('stage');
-      const shelf = document.getElementById('shelf');
-      const playRing = document.getElementById('play-ring');
-      const capTitle = document.getElementById('cap-title');
-      const capSub = document.getElementById('cap-sub');
-      const capYear = document.getElementById('cap-year');
-      const tlTicks = document.getElementById('tl-ticks');
-      const tlLabels = document.getElementById('tl-labels');
-      const tlDot = document.getElementById('tl-dot');
-      const timeline = document.getElementById('timeline');
-      const btnPrev = document.getElementById('btn-prev');
-      const btnNext = document.getElementById('btn-next');
-      const cursor = document.getElementById('cursor');
+      // Pleated Gingham Empire Shade
+      const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.36, 0.38, 24, 1, true), shadeMat);
+      shade.position.y = 0.62;
+      shade.castShadow = true;
+      lampGroup.add(shade);
 
-      const detail = document.getElementById('detail');
-      const detailClose = document.getElementById('detail-close');
-      const detSub = document.getElementById('det-sub');
-      const detTitle = document.getElementById('det-title');
-      const detMeta = document.getElementById('det-meta');
-      const detSynopsis = document.getElementById('det-synopsis');
-      const detailPosterImg = document.getElementById('detail-poster-img');
+      // Interior Lamp Glow PointLight
+      const lampGlow = new THREE.PointLight(0xFFE2A8, 1.2, 4);
+      lampGlow.position.set(0, 0.55, 0);
+      lampGroup.add(lampGlow);
 
-      // ─── Build Timeline Ticks ───
-      for (let y = 1955; y <= 1990; y++) {
-        const pct = ((y - 1955) / 35) * 100;
-        const isMajor = y % 5 === 0;
-        const tick = document.createElement('div');
-        tick.className = `tl-tick ${isMajor ? 'major' : 'minor'}`;
-        tick.style.left = `${pct}%`;
-        tlTicks.appendChild(tick);
+      scene.add(lampGroup);
+      registerProduct(lampBase, 'lamp');
+      registerProduct(shade, 'lamp');
 
-        if (isMajor) {
-          const lbl = document.createElement('div');
-          lbl.className = `tl-lbl ${y === 1955 ? 'first' : y === 1990 ? 'last' : ''}`;
-          lbl.style.left = `${pct}%`;
-          lbl.textContent = y;
-          tlLabels.appendChild(lbl);
-        }
+      // MODEL 4: The Swedish Fika Loop Mug
+      const mugGroup = new THREE.Group();
+      mugGroup.position.set(-0.4, 1.41, 0.6);
+
+      const mugMat = new THREE.MeshStandardMaterial({ color: 0xF8F3E6, roughness: 0.2 });
+      const mugBody = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.12, 0.22, 24), mugMat);
+      mugBody.position.y = 0.11;
+      mugBody.castShadow = true;
+      mugGroup.add(mugBody);
+
+      // Oversized Ring Handle
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.024, 12, 24), mugMat);
+      handle.position.set(0.14, 0.11, 0);
+      handle.rotation.y = Math.PI / 2;
+      mugGroup.add(handle);
+
+      // Coffee Liquid inside
+      const coffee = new THREE.Mesh(new THREE.CircleGeometry(0.115, 24), new THREE.MeshStandardMaterial({ color: 0x362014, roughness: 0.2 }));
+      coffee.rotation.x = -Math.PI / 2;
+      coffee.position.y = 0.2;
+      mugGroup.add(coffee);
+
+      scene.add(mugGroup);
+      registerProduct(mugBody, 'mug');
+
+      // MODEL 5: Trollskogen Cast Brass Matchbox
+      const matchboxGroup = new THREE.Group();
+      matchboxGroup.position.set(0.85, 1.41, 0.5);
+
+      const brassMat = new THREE.MeshStandardMaterial({
+        color: 0xDFAC4B,
+        metalness: 0.88,
+        roughness: 0.22,
+      });
+      const matchboxMesh = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.16), brassMat);
+      matchboxMesh.position.y = 0.03;
+      matchboxMesh.rotation.y = 0.35;
+      matchboxMesh.castShadow = true;
+      matchboxGroup.add(matchboxMesh);
+
+      scene.add(matchboxGroup);
+      registerProduct(matchboxMesh, 'matchbox');
+
+      // ─── 7. Floating Dandelion / Pollen Spores Particle System ───
+      const particleCount = 280;
+      const particleGeo = new THREE.BufferGeometry();
+      const particlePos = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        particlePos[i] = (Math.random() - 0.5) * 12;
+        particlePos[i + 1] = Math.random() * 5 + 0.5;
+        particlePos[i + 2] = (Math.random() - 0.5) * 8;
       }
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
 
-      // ─── Create 36 Tapes in DOM ───
-      const TOTAL_TAPES = 36;
-      const tapeNodes = [];
+      const particleMat = new THREE.PointsMaterial({
+        color: 0xFFEEB8,
+        size: 0.045,
+        transparent: true,
+        opacity: 0.7,
+      });
+      const particles = new THREE.Points(particleGeo, particleMat);
+      scene.add(particles);
 
-      for (let v = 0; v < TOTAL_TAPES; v++) {
-        const filmIndex = v % 12;
-        const film = FILMS[filmIndex];
-
-        const tape = document.createElement('div');
-        tape.className = 'tape';
-        tape.dataset.v = v;
-        tape.dataset.film = filmIndex;
-
-        const spine = document.createElement('div');
-        spine.className = 'tape-face sp';
-        spine.style.cssText = getCropCSS(film.spine);
-
-        const cover = document.createElement('div');
-        cover.className = 'tape-face cv';
-        cover.style.cssText = getCropCSS(film.cover);
-
-        tape.appendChild(spine);
-        tape.appendChild(cover);
-        stage.appendChild(tape);
-
-        tapeNodes.push({ el: tape, sp: spine, cv: cover, filmIndex, v, lift: 0 });
-      }
-
-      // ─── State & Physics Variables ───
-      let s = 17; // initial position: Noon in Ashes (copy 1, index 5 => 5 + 12 = 17)
-      let T = 17;
+      // ─── 8. Camera Controls, Raycasting & Drag Interaction ───
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2(-999, -999);
       let isDragging = false;
-      let dragStartX = 0;
-      let dragStartT = 17;
-      let hasDragged = false;
-      let hoveredIndex = -1;
-      let activeFilmIndex = 5;
-      let isDetailOpen = false;
+      let prevMouseX = 0, prevMouseY = 0;
+      let orbitPhi = 0, orbitTheta = 0;
+      let activeProductKey = null;
 
-      // Mouse & Cursor Tracking
-      let mx = window.innerWidth / 2;
-      let my = window.innerHeight / 2;
-      let curX = mx;
-      let curY = my;
-      let tiltX = 0;
-      let tiltY = 0;
-      let cursorState = ''; // 'open', 'spine', 'btn', ''
+      // Cursor movement
+      const cursor = document.getElementById('cursor');
+      const curRing = document.getElementById('cur-ring');
+      let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      let mx = cx, my = cy;
 
-      // Measure layout helper
-      let H = 300, ws = 50, d = 158, gap = 10, U = 390;
-      const P = 1400;
-      let XS = [];
-
-      function updateMeasurements() {
-        const isMobile = window.innerWidth <= 767;
-        H = isMobile
-          ? Math.min(window.innerWidth * 0.68, window.innerHeight * 0.40)
-          : Math.min(window.innerHeight * 0.47, window.innerWidth * 0.33);
-
-        ws = H * (142 / 840);
-        d = H * (474 / 900);
-        gap = H * 0.035;
-        U = isMobile ? H * 1.05 : H * 1.3;
-
-        document.documentElement.style.setProperty('--ws', `${ws}px`);
-        document.documentElement.style.setProperty('--d', `${d}px`);
-
-        // Precompute XS integral table
-        XS = [];
-        let acc = 0;
-        const maxU = 3 * U;
-        for (let u = 0; u <= maxU; u += 2) {
-          acc += 2 / (1 + Math.pow(u / U, 1.6));
-          XS.push(acc);
-        }
-      }
-      updateMeasurements();
-      window.addEventListener('resize', updateMeasurements);
-
-      function getRel(v, centerS) {
-        let diff = (v - centerS) % 36;
-        while (diff < -18) diff += 36;
-        while (diff >= 18) diff -= 36;
-        return diff;
-      }
-
-      function B(r) {
-        if (Math.abs(r) < 1) {
-          return (r + Math.sin(Math.PI * r) / Math.PI) / 2;
-        }
-        return Math.sign(r) * 0.5;
-      }
-
-      function F(r) {
-        return r * (ws + gap) + (d - ws + 1.4 * gap) * B(r);
-      }
-
-      function scl(u) {
-        return 1 / (1 + Math.pow(Math.abs(u) / U, 1.6));
-      }
-
-      function xsc(u) {
-        const absU = Math.abs(u);
-        const idx = Math.min(Math.floor(absU / 2), XS.length - 1);
-        return Math.sign(u) * (XS[idx] || 0);
-      }
-
-      // ─── Caption Swap (Mask Slide) ───
-      function updateCaption(newIndex, dir) {
-        const film = FILMS[newIndex];
-        const swap = (el, newText) => {
-          const oldSpan = el.firstElementChild || el;
-          const currentText = oldSpan.textContent;
-          if (currentText === newText) return;
-
-          const newSpan = document.createElement('span');
-          newSpan.style.display = 'inline-block';
-          newSpan.textContent = newText;
-
-          el.innerHTML = '';
-          el.appendChild(newSpan);
-
-          newSpan.animate([
-            { transform: `translateY(${dir * 105}%)` },
-            { transform: 'translateY(0)' }
-          ], { duration: 650, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'both' });
-        };
-
-        swap(capTitle, film.title);
-        swap(capSub, `${film.romaji} / ${film.kanji}`);
-        swap(capYear, `${film.year} — ${film.genre.toUpperCase()}`);
-      }
-
-      // ─── Animation Loop ───
-      let lastTime = performance.now();
-
-      function animate(time) {
-        requestAnimationFrame(animate);
-
-        let dt = Math.min((time - lastTime) / 1000, 0.05);
-        lastTime = time;
-
-        // Smooth spring physics for s -> T
-        const kSpring = isDragging ? 18 : 5.2;
-        s += (T - s) * (1 - Math.exp(-kSpring * dt));
-
-        // Loop shifting when moving far
-        if (s > 24) { s -= 12; T -= 12; }
-        if (s < 12) { s += 12; T += 12; }
-
-        // Active film determination
-        const currentActiveFilm = ((Math.round(s) % 12) + 12) % 12;
-        if (currentActiveFilm !== activeFilmIndex) {
-          const dir = Math.sign(T - s) || 1;
-          updateCaption(currentActiveFilm, dir);
-          activeFilmIndex = currentActiveFilm;
-        }
-
-        // Timeline dot interpolation
-        const baseFloor = Math.floor(s);
-        const frac = s - baseFloor;
-        const f0 = FILMS[((baseFloor % 12) + 12) % 12];
-        const f1 = FILMS[(((baseFloor + 1) % 12) + 12) % 12];
-        let currentYear = f0.year + (f1.year - f0.year) * frac;
-        if (f0.year === 1989 && f1.year === 1958) {
-          currentYear = frac < 0.5 ? 1989 : 1958;
-        }
-        const dotPct = ((currentYear - 1955) / 35) * 100;
-        tlDot.style.left = `${Math.max(0, Math.min(100, dotPct))}%`;
-
-        // Cursor smoothing
-        curX += (mx - curX) * (1 - Math.exp(-16 * dt));
-        curY += (my - curY) * (1 - Math.exp(-16 * dt));
-        cursor.style.left = `${curX}px`;
-        cursor.style.top = `${curY}px`;
-
-        // Check if mouse is on cover face
-        const shelfRect = shelf.getBoundingClientRect();
-        const shelfCenterY = shelfRect.top + shelfRect.height / 2;
-        const isOnCover = Math.abs(mx - window.innerWidth / 2) < (d * 0.55) &&
-                          Math.abs(my - shelfCenterY) < (H * 0.55) &&
-                          Math.abs(T - s) < 0.3 &&
-                          !isDetailOpen;
-
-        if (isOnCover) {
-          tiltY += (((mx - window.innerWidth / 2) / (d * 0.55)) * 8 - tiltY) * (1 - Math.exp(-7 * dt));
-          tiltX += ((-((my - shelfCenterY) / (H * 0.5)) * 5) - tiltX) * (1 - Math.exp(-7 * dt));
-          cursorState = 'open';
-        } else {
-          tiltY += (((mx - window.innerWidth / 2) / window.innerWidth) * 4 - tiltY) * (1 - Math.exp(-7 * dt));
-          tiltX += (0 - tiltX) * (1 - Math.exp(-7 * dt));
-          if (hoveredIndex !== -1 && hoveredIndex !== activeFilmIndex) {
-            cursorState = 'spine';
-          }
-        }
-
-        cursor.className = cursorState;
-
-        // Play Ring Positioning
-        const settleScale = smoothstep(Math.max(0, 1 - Math.abs(T - s) * 3));
-        const ringX = window.innerWidth / 2 - d / 2 - 6;
-        const ringY = shelfCenterY + H * 0.36;
-        playRing.style.left = `${ringX}px`;
-        playRing.style.top = `${ringY}px`;
-        playRing.style.transform = `translate(-50%, -50%) scale(${isDetailOpen ? 0 : settleScale})`;
-
-        // Render each VHS tape
-        for (let i = 0; i < TOTAL_TAPES; i++) {
-          const tape = tapeNodes[i];
-          const r = getRel(tape.v, s);
-
-          // Ease hover lift
-          const isHovered = hoveredIndex === tape.v && Math.abs(r) > 0.5;
-          const targetLift = isHovered ? 1 : 0;
-          tape.lift += (targetLift - tape.lift) * (1 - Math.exp(-12 * dt));
-
-          const u = F(r);
-
-          if (Math.abs(u) > U * 1.95) {
-            tape.el.style.display = 'none';
-            continue;
-          }
-          tape.el.style.display = 'block';
-
-          const o = smoothstep(Math.max(0, 1 - Math.abs(r)));
-          const sc = scl(u);
-          const k = 1 / sc;
-
-          const z = P * (1 - k) + o * H * 0.1;
-          const x = xsc(u) * k;
-          const y = (H * 0.5 * (1 - sc) * 0.42 + o * H * 0.012 - tape.lift * H * 0.05) * k;
-
-          const rotY = Math.sign(u) * Math.min(1, Math.abs(u) / U) * 26 * (1 - o) - 90 * o + tiltY * o;
-          const rotX = tiltX * o;
-
-          tape.el.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-          tape.el.style.zIndex = Math.round(3000 + z);
-
-          // Shading
-          const spineShade = Math.min(0.6, o * 0.55 + (1 - sc) * 0.32);
-          const coverShade = (1 - o) * 0.82;
-          tape.sp.style.setProperty('--shade', spineShade);
-          tape.cv.style.setProperty('--shade', coverShade);
-        }
-      }
-      requestAnimationFrame(animate);
-
-      // ─── Interaction Handlers ───
       window.addEventListener('pointermove', (e) => {
         mx = e.clientX;
         my = e.clientY;
 
-        const target = e.target.closest('button, a, #timeline');
-        if (target) {
-          cursorState = 'btn';
-        } else if (cursorState === 'btn') {
-          cursorState = '';
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+        if (isDragging) {
+          const dx = e.clientX - prevMouseX;
+          const dy = e.clientY - prevMouseY;
+          orbitTheta -= dx * 0.005;
+          orbitPhi = Math.max(-0.4, Math.min(0.6, orbitPhi + dy * 0.005));
+          prevMouseX = e.clientX;
+          prevMouseY = e.clientY;
+        }
+
+        // Raycast hovered objects
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(interactiveMeshes);
+
+        if (intersects.length > 0) {
+          cursor.classList.add('hover');
+          curRing.textContent = 'SE';
+        } else {
+          cursor.classList.remove('hover');
+          curRing.textContent = '✦';
         }
       });
 
-      // Pointer drag scrubbing
-      shelf.addEventListener('pointerdown', (e) => {
-        if (isDetailOpen) return;
+      window.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.ui-layer, #object-inspector, #cart-drawer')) return;
         isDragging = true;
-        dragStartX = e.clientX;
-        dragStartT = T;
-        hasDragged = false;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+        cursor.classList.add('grab');
       });
 
-      window.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - dragStartX;
-        if (Math.abs(dx) > 5) {
-          hasDragged = true;
-          T = dragStartT - dx / (ws + gap);
-        }
-      });
-
-      window.addEventListener('pointerup', () => {
+      window.addEventListener('pointerup', (e) => {
+        cursor.classList.remove('grab');
         if (!isDragging) return;
         isDragging = false;
-        if (hasDragged) {
-          T = Math.round(T);
+
+        // If click was a fast tap, check for object click
+        if (Math.abs(e.clientX - prevMouseX) < 6 && Math.abs(e.clientY - prevMouseY) < 6) {
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(interactiveMeshes);
+          if (intersects.length > 0) {
+            const key = intersects[0].object.userData.productKey;
+            inspectProduct(key);
+          }
         }
       });
 
-      // Wheel scrub
-      let wheelTimeout = null;
       window.addEventListener('wheel', (e) => {
-        if (isDetailOpen) return;
-        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-        T += (delta / (ws + gap)) * 0.5;
-
-        clearTimeout(wheelTimeout);
-        wheelTimeout = setTimeout(() => {
-          T = Math.round(T);
-        }, 160);
+        if (e.target.closest('#cart-drawer, #object-inspector')) return;
+        const zoomDelta = e.deltaY * 0.003;
+        targetCamPos.z = Math.max(1.8, Math.min(8.0, targetCamPos.z + zoomDelta));
       }, { passive: true });
 
-      // Click tapes
-      stage.addEventListener('click', (e) => {
-        if (hasDragged) return;
-        const tape = e.target.closest('.tape');
-        if (!tape) return;
-
-        const v = parseInt(tape.dataset.v, 10);
-        const r = getRel(v, s);
-
-        if (Math.abs(r) < 0.45) {
-          openDetail(activeFilmIndex);
-        } else {
-          T = Math.round(T + r);
-        }
+      // Window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // Tape hover detection
-      stage.addEventListener('pointerover', (e) => {
-        const tape = e.target.closest('.tape');
-        if (tape) {
-          hoveredIndex = parseInt(tape.dataset.v, 10);
-        }
-      });
+      // ─── 9. Waypoint & Product Inspection Functions ───
+      window.flyToWaypoint = function(wpKey) {
+        playClink();
+        document.querySelectorAll('.tour-pill').forEach(b => b.classList.remove('active'));
+        const activeBtn = Array.from(document.querySelectorAll('.tour-pill')).find(b => b.textContent.toLowerCase().includes(wpKey));
+        if (activeBtn) activeBtn.classList.add('active');
 
-      stage.addEventListener('pointerout', (e) => {
-        const tape = e.target.closest('.tape');
-        if (tape && hoveredIndex === parseInt(tape.dataset.v, 10)) {
-          hoveredIndex = -1;
-          cursorState = '';
-        }
-      });
+        const wp = WAYPOINTS[wpKey];
+        targetCamPos = { ...wp.pos };
+        targetLookAt = { ...wp.target };
+        orbitPhi = 0;
+        orbitTheta = 0;
+        closeInspector();
+      };
 
-      // Arrow navigation
-      btnPrev.addEventListener('click', () => { T = Math.round(T - 1); });
-      btnNext.addEventListener('click', () => { T = Math.round(T + 1); });
+      window.inspectProduct = function(key) {
+        playClink();
+        const p = PRODUCTS[key];
+        if (!p) return;
+        activeProductKey = key;
 
-      // Keyboard navigation
-      window.addEventListener('keydown', (e) => {
-        if (isDetailOpen) {
-          if (e.key === 'Escape') closeDetail();
-          return;
-        }
-        if (e.key === 'ArrowLeft') T = Math.round(T - 1);
-        if (e.key === 'ArrowRight') T = Math.round(T + 1);
-        if (e.key === 'Enter') openDetail(activeFilmIndex);
-      });
+        targetCamPos = { ...p.cameraPos };
+        targetLookAt = { ...p.targetPos };
+        orbitPhi = 0;
+        orbitTheta = 0;
 
-      // Timeline click jump
-      timeline.addEventListener('click', (e) => {
-        const rect = timeline.getBoundingClientRect();
-        const pct = (e.clientX - rect.left) / rect.width;
-        const clickedYear = 1955 + pct * 35;
+        document.getElementById('insp-category').textContent = p.category;
+        document.getElementById('insp-title').textContent = p.name;
+        document.getElementById('insp-subtitle').textContent = p.subtitle;
+        document.getElementById('insp-desc').textContent = p.desc;
+        document.getElementById('insp-provenance').textContent = p.provenance;
+        document.getElementById('insp-material').textContent = p.material;
+        document.getElementById('insp-dimensions').textContent = p.dimensions;
+        document.getElementById('insp-price').textContent = `$${p.price}`;
 
-        // Find film with closest year
-        let bestFilmIndex = 0;
-        let minDiff = Infinity;
-        FILMS.forEach((f, idx) => {
-          const diff = Math.abs(f.year - clickedYear);
-          if (diff < minDiff) {
-            minDiff = diff;
-            bestFilmIndex = idx;
-          }
-        });
-
-        // Jump shortest way round
-        const curMod = ((Math.round(T) % 12) + 12) % 12;
-        let diff = bestFilmIndex - curMod;
-        if (diff > 6) diff -= 12;
-        if (diff < -6) diff += 12;
-        T = Math.round(T + diff);
-      });
-
-      // ─── Detail Sheet & Ink Bleed Animation ───
-      function openDetail(filmIdx) {
-        isDetailOpen = true;
-        const film = FILMS[filmIdx];
-
-        // Fill contents
-        detSub.textContent = `${film.romaji} / ${film.kanji}`;
-        detTitle.textContent = film.title;
-        detMeta.textContent = `${film.year} / ${film.genre.toUpperCase()} / ${film.min} MIN`;
-        detSynopsis.textContent = film.synopsis;
-
-        // Aim poster SVG image to cover crop
-        const [sheetKey, x, y, w, h] = film.cover;
-        const [url, W, H_img] = SHEETS[sheetKey];
-        detailPosterImg.setAttribute('href', url);
-        detailPosterImg.setAttribute('x', `${-x * (474 / w)}`);
-        detailPosterImg.setAttribute('y', `${-y * (900 / h)}`);
-        detailPosterImg.setAttribute('width', `${W * (474 / w)}`);
-        detailPosterImg.setAttribute('height', `${H_img * (900 / h)}`);
-
-        // Get projected cover face bounding rect
-        const activeTape = tapeNodes.find(t => (t.v % 12) === filmIdx && Math.abs(getRel(t.v, s)) < 0.6);
-        let startRect = { top: window.innerHeight * 0.25, left: window.innerWidth * 0.4, width: d, height: H };
-        if (activeTape) {
-          const rect = activeTape.cv.getBoundingClientRect();
-          if (rect.width > 20) startRect = rect;
-        }
-
-        const insetTop = startRect.top;
-        const insetRight = window.innerWidth - (startRect.left + startRect.width);
-        const insetBottom = window.innerHeight - (startRect.top + startRect.height);
-        const insetLeft = startRect.left;
-
-        detail.style.display = 'block';
-
-        // 1. Morph paper sheet from cover rect to full screen
-        detail.animate([
-          { clipPath: `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px round 3px)` },
-          { clipPath: 'inset(0px 0px 0px 0px round 0px)' }
-        ], {
-          duration: 1050,
-          easing: 'cubic-bezier(0.76, 0, 0.18, 1)',
-          fill: 'both'
-        });
-
-        // 2. Rise text lines
-        const lines = detail.querySelectorAll('.detail-line > *');
-        lines.forEach((el, i) => {
-          el.animate([
-            { transform: 'translateY(110%)', opacity: 0 },
-            { transform: 'translateY(0)', opacity: 1 }
-          ], {
-            duration: 900,
-            delay: 620 + i * 75,
-            easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
-            fill: 'both'
-          });
-        });
-
-        // 3. Ink Bleed Circles Animation
-        const circleData = [
-          { id: 'ic0', delay: 0 },
-          { id: 'ic1', delay: 120 },
-          { id: 'ic2', delay: 220 },
-          { id: 'ic3', delay: 300 },
-          { id: 'ic4', delay: 360 },
-          { id: 'ic5', delay: 420 },
-          { id: 'ic6', delay: 180 },
-        ];
-
-        circleData.forEach(c => {
-          const circleEl = document.getElementById(c.id);
-          circleEl.setAttribute('r', '0');
-          circleEl.animate([
-            { r: 0 },
-            { r: 720 }
-          ], {
-            duration: 1250,
-            delay: 520 + c.delay,
-            easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-            fill: 'forwards'
-          });
-        });
-      }
-
-      function closeDetail() {
-        const activeTape = tapeNodes.find(t => (t.v % 12) === activeFilmIndex && Math.abs(getRel(t.v, s)) < 0.6);
-        let endRect = { top: window.innerHeight * 0.25, left: window.innerWidth * 0.4, width: d, height: H };
-        if (activeTape) {
-          const rect = activeTape.cv.getBoundingClientRect();
-          if (rect.width > 20) endRect = rect;
-        }
-
-        const insetTop = endRect.top;
-        const insetRight = window.innerWidth - (endRect.left + endRect.width);
-        const insetBottom = window.innerHeight - (endRect.top + endRect.height);
-        const insetLeft = endRect.left;
-
-        const anim = detail.animate([
-          { clipPath: 'inset(0px 0px 0px 0px round 0px)' },
-          { clipPath: `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px round 3px)` }
-        ], {
-          duration: 850,
-          easing: 'cubic-bezier(0.76, 0, 0.18, 1)',
-          fill: 'both'
-        });
-
-        anim.onfinish = () => {
-          detail.style.display = 'none';
-          isDetailOpen = false;
+        const addBtn = document.getElementById('insp-add-btn');
+        addBtn.onclick = () => {
+          addToBag(p.name, p.price, p.img);
         };
+
+        document.getElementById('object-inspector').classList.add('active');
+      };
+
+      window.closeInspector = function() {
+        document.getElementById('object-inspector').classList.remove('active');
+        activeProductKey = null;
+      };
+
+      // ─── 10. Atmospheric Lighting Modes ───
+      window.setLightingMode = function(mode) {
+        playClink();
+        document.querySelectorAll('.atmo-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`atmo-${mode}`).classList.add('active');
+
+        if (mode === 'morning') {
+          scene.background.set(0xF4EFE6);
+          scene.fog.color.set(0xF4EFE6);
+          sunLight.color.set(0xFFF3D6);
+          sunLight.intensity = 1.8;
+          ambientLight.intensity = 0.9;
+          candleLight1.intensity = 0.4;
+          candleLight2.intensity = 0.4;
+          renderer.toneMappingExposure = 1.05;
+        } else if (mode === 'fika') {
+          scene.background.set(0xF7E2B4);
+          scene.fog.color.set(0xF7E2B4);
+          sunLight.color.set(0xFFB852);
+          sunLight.intensity = 1.6;
+          ambientLight.intensity = 0.7;
+          candleLight1.intensity = 0.8;
+          candleLight2.intensity = 0.8;
+          renderer.toneMappingExposure = 1.0;
+        } else if (mode === 'midnight') {
+          scene.background.set(0x182032);
+          scene.fog.color.set(0x182032);
+          sunLight.color.set(0x406090);
+          sunLight.intensity = 0.35;
+          ambientLight.intensity = 0.25;
+          candleLight1.intensity = 1.8;
+          candleLight2.intensity = 1.8;
+          renderer.toneMappingExposure = 1.25;
+        }
+      };
+
+      // ─── 11. Shopping Bag State & Drawer ───
+      const cart = [];
+      window.toggleCart = function(open) {
+        const d = document.getElementById('cart-drawer');
+        if (open) d.classList.add('open');
+        else d.classList.remove('open');
+      };
+
+      window.addToBag = function(title, price, img) {
+        playClink();
+        const existing = cart.find(i => i.title === title);
+        if (existing) existing.qty++;
+        else cart.push({ title, price, img, qty: 1 });
+        renderCart();
+        toggleCart(true);
+      };
+
+      function renderCart() {
+        const container = document.getElementById('cart-items');
+        container.innerHTML = '';
+        let total = 0, count = 0;
+
+        cart.forEach((item, idx) => {
+          total += item.price * item.qty;
+          count += item.qty;
+
+          const el = document.createElement('div');
+          el.className = 'cart-item';
+          el.innerHTML = `
+            <img src="${item.img}" style="width:58px; height:58px; border-radius:12px; object-fit:cover; border:2px solid var(--ink);" />
+            <div style="flex:1;">
+              <h4 class="font-serif" style="font-size:15px; font-weight:800;">${item.title}</h4>
+              <p style="font-size:13px; font-weight:700; color:var(--lingon);">$${item.price} USD</p>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+                <button onclick="updateQty(${idx}, -1)" style="font-weight:900; padding:2px 8px; border:1px solid var(--ink); border-radius:6px; cursor:pointer;">-</button>
+                <span style="font-size:12px; font-weight:700;">${item.qty}</span>
+                <button onclick="updateQty(${idx}, 1)" style="font-weight:900; padding:2px 8px; border:1px solid var(--ink); border-radius:6px; cursor:pointer;">+</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(el);
+        });
+
+        document.getElementById('bag-count').textContent = count;
+        document.getElementById('cart-subtotal').textContent = `$${total} USD`;
       }
 
-      detailClose.addEventListener('click', closeDetail);
+      window.updateQty = function(idx, delta) {
+        playClink();
+        cart[idx].qty += delta;
+        if (cart[idx].qty <= 0) cart.splice(idx, 1);
+        renderCart();
+      };
+
+      window.triggerCheckout = function() {
+        alert("✦ Välkommen till Reum.store!\n\nYour bag is ready. In production, this connects to Stripe Payment Links with $0/month in hosting costs!");
+      };
+
+      // ─── 12. Procedural Web Audio Synthesizer ───
+      let audioCtx = null;
+      let isSoundOn = false;
+      let noiseNode = null;
+      let droneOsc = null;
+
+      function playClink() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(850 + Math.random() * 300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      }
+
+      window.toggleAudio = function() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        if (isSoundOn) {
+          if (noiseNode) { noiseNode.stop(); noiseNode = null; }
+          if (droneOsc) { droneOsc.stop(); droneOsc = null; }
+          isSoundOn = false;
+          document.body.classList.remove('sound-on');
+        } else {
+          // Hearth noise
+          const bufferSize = audioCtx.sampleRate * 2;
+          const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const out = noiseBuffer.getChannelData(0);
+          let lastOut = 0.0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            out[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = out[i];
+            if (Math.random() < 0.001) out[i] += (Math.random() - 0.5) * 0.9;
+          }
+
+          noiseNode = audioCtx.createBufferSource();
+          noiseNode.buffer = noiseBuffer;
+          noiseNode.loop = true;
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+          noiseNode.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          noiseNode.start();
+
+          // Harmonic Drone
+          droneOsc = audioCtx.createOscillator();
+          const droneGain = audioCtx.createGain();
+          droneOsc.type = 'sine';
+          droneOsc.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+          droneGain.gain.setValueAtTime(0.018, audioCtx.currentTime);
+          droneOsc.connect(droneGain);
+          droneGain.connect(audioCtx.destination);
+          droneOsc.start();
+
+          isSoundOn = true;
+          document.body.classList.add('sound-on');
+        }
+      };
+
+      // ─── 13. Main Render & Animation Loop ───
+      let clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const elapsedTime = clock.getElapsedTime();
+
+        // Candle flame dynamic flicker
+        const flicker1 = Math.sin(elapsedTime * 14) * 0.15 + (Math.random() - 0.5) * 0.12;
+        const flicker2 = Math.cos(elapsedTime * 18) * 0.15 + (Math.random() - 0.5) * 0.12;
+        flameMesh1.scale.set(1 + flicker1, 1 + flicker1 * 1.5, 1 + flicker1);
+        flameMesh2.scale.set(1 + flicker2, 1 + flicker2 * 1.5, 1 + flicker2);
+        candleLight1.intensity = 1.0 + flicker1;
+        candleLight2.intensity = 1.0 + flicker2;
+
+        // Animate particles drifting
+        const positions = particleGeo.attributes.position.array;
+        for (let i = 1; i < particleCount * 3; i += 3) {
+          positions[i] -= 0.004;
+          if (positions[i] < 0.5) positions[i] = 5.5;
+        }
+        particleGeo.attributes.position.needsUpdate = true;
+
+        // Smooth Camera Navigation Lerp
+        const finalTargetCamX = targetCamPos.x + Math.sin(orbitTheta) * 2;
+        const finalTargetCamZ = targetCamPos.z * Math.cos(orbitTheta);
+        const finalTargetCamY = targetCamPos.y + orbitPhi * 2;
+
+        currentCamPos.x += (finalTargetCamX - currentCamPos.x) * 0.055;
+        currentCamPos.y += (finalTargetCamY - currentCamPos.y) * 0.055;
+        currentCamPos.z += (finalTargetCamZ - currentCamPos.z) * 0.055;
+
+        currentLookAt.x += (targetLookAt.x - currentLookAt.x) * 0.055;
+        currentLookAt.y += (targetLookAt.y - currentLookAt.y) * 0.055;
+        currentLookAt.z += (targetLookAt.z - currentLookAt.z) * 0.055;
+
+        camera.position.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
+        camera.lookAt(currentLookAt.x, currentLookAt.y, currentLookAt.z);
+
+        // Cursor smoothing
+        cx += (mx - cx) * 0.25;
+        cy += (my - cy) * 0.25;
+        cursor.style.left = `${cx}px`;
+        cursor.style.top = `${cy}px`;
+
+        renderer.render(scene, camera);
+      }
+
+      // Hide Loader Once Scene is Loaded
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('gone');
+        animate();
+      }, 400);
 
     })();
   </script>
 </body>
 </html>
-
