@@ -692,16 +692,12 @@
   <div id="cursor">
     <div class="cur-ring">
       <div class="cur-dot"></div>
-      <span class="cur-label">Explore</span>
     </div>
   </div>
 
   <!-- Intro Loader -->
   <div id="loader">
     <div class="loader-dot"></div>
-    <p style="font-family:'Antonio',sans-serif; font-size:16px; letter-spacing:0.2em; text-transform:uppercase; color:var(--bone); margin-top:20px;">
-      Reum · Stockholm
-    </p>
   </div>
 
   <!-- UI OVERLAY -->
@@ -742,25 +738,14 @@
 
   <!-- OBJECT INSPECTION MODAL -->
   <div id="detail-overlay" role="dialog" aria-modal="true">
-    <button class="detail-close-btn" onclick="closeDetail()">✕ Close View</button>
+    <button class="detail-close-btn" onclick="closeDetail()">✕</button>
 
     <div class="detail-left">
-      <span class="det-badge" id="det-cat">Tableware · Duka</span>
       <h2 class="det-title" id="det-title">The Wiggle Butter Dish</h2>
-      <p class="det-swedish" id="det-sub">Smörask med vågkant</p>
-      <p class="det-desc" id="det-desc">
-        A cheerful hand-glazed earthenware butter crock with an undulating wavy rim and spherical mushroom knob. Handcrafted for slow Swedish Sunday breakfasts.
-      </p>
-
-      <div class="det-specs">
-        <div><strong>Provenance:</strong> <span id="det-prov">Alcobaça, Portugal</span></div>
-        <div><strong>Material:</strong> <span id="det-mat">High-fire earthenware, food-safe glaze</span></div>
-        <div><strong>Dimensions:</strong> <span id="det-dim">14cm L × 10cm W × 8.5cm H</span></div>
-      </div>
 
       <div class="det-action-row">
         <span class="det-price" id="det-price">$58</span>
-        <button class="det-buy-btn" id="det-add-btn">Adopt to Bag +</button>
+        <button class="det-buy-btn" id="det-add-btn">Add to Bag +</button>
       </div>
     </div>
 
@@ -774,7 +759,7 @@
   <!-- SLIDE-OVER BAG DRAWER -->
   <aside id="cart-drawer">
     <div class="cart-head">
-      <h3 class="cart-title">Your Bag</h3>
+      <h3 class="cart-title">Bag</h3>
       <button onclick="toggleCart(false)" style="color:var(--bone); font-size:22px; cursor:pointer;">✕</button>
     </div>
 
@@ -785,13 +770,10 @@
     <div class="cart-foot">
       <div style="display:flex; justify-content:space-between; font-family:'Antonio',sans-serif; font-size:20px;">
         <span>Total:</span>
-        <span id="cart-subtotal" style="color:var(--gold);">$0 USD</span>
+        <span id="cart-subtotal" style="color:var(--gold);">$0</span>
       </div>
-      <p style="font-size:11px; color:rgba(245,239,230,0.6);">
-        ✦ Free shipping on orders over $120. Plastic-free Swedish packaging.
-      </p>
       <button class="det-buy-btn" style="width:100%; border-radius:99px;" onclick="triggerCheckout()">
-        Proceed to Checkout →
+        Checkout →
       </button>
     </div>
   </aside>
@@ -1113,13 +1095,7 @@
         isDetailActive = true;
         heroCenter.classList.add('blurred');
 
-        document.getElementById('det-cat').textContent = product.cat;
         document.getElementById('det-title').textContent = product.name;
-        document.getElementById('det-sub').textContent = product.sub;
-        document.getElementById('det-desc').textContent = product.desc;
-        document.getElementById('det-prov').textContent = product.prov;
-        document.getElementById('det-mat').textContent = product.mat;
-        document.getElementById('det-dim').textContent = product.dim;
         document.getElementById('det-price').textContent = `$${product.price}`;
         document.getElementById('det-img').src = product.img;
 
