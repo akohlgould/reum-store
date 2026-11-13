@@ -777,80 +777,8 @@
     (function () {
       'use strict';
 
-      // ─── 1. Product Data ───
+      // ─── 1. Product Data: Pure Scandinavian Turned Wood Sculptures ───
       const PRODUCTS = [
-        {
-          id: 'butter',
-          name: 'The Wiggle Butter Dish',
-          sub: 'Smörask med vågkant',
-          cat: 'Tableware · Duka',
-          price: 58,
-          prov: 'Handmade in Alcobaça, Portugal',
-          mat: 'High-fire glazed earthenware',
-          dim: '14cm L × 10cm W × 8.5cm H',
-          desc: 'A joyful butter crock featuring an undulating wavy lid and mushroom knob in sunny Buttercup Yellow and Lingonberry Red.',
-          img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=800&q=80',
-        },
-        {
-          id: 'candle',
-          name: 'Krumelur Twist Candlestick',
-          sub: 'Tvilling-ljusstake',
-          cat: 'Candles & Glow · Ljus',
-          price: 64,
-          prov: 'Cast in Caldas da Rainha, Portugal',
-          mat: 'Matte-finish speckled stoneware',
-          dim: '19cm H × 14cm W',
-          desc: 'Asymmetric twin helical candlestick designed to hold double taper candles in joyful conversation. Inspired by Dalarna ironcraft.',
-          img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=800&q=80',
-        },
-        {
-          id: 'linen',
-          name: 'Skogsbär Scallop Napkins',
-          sub: 'Linneduk med vågkant',
-          cat: 'Baltic Linens · Textil',
-          price: 72,
-          prov: 'Woven & sewn in Kaunas, Lithuania',
-          mat: '100% Pre-washed Baltic Flax',
-          dim: '45cm × 45cm (Set of 4)',
-          desc: 'Substantial European linen finished with a vibrant lingonberry-red scalloped merrow border. Gets softer with every Sunday fika.',
-          img: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=800&q=80',
-        },
-        {
-          id: 'lamp',
-          name: 'Bobbin Turned Birch Lamp',
-          sub: 'Svarvad bordslampa',
-          cat: 'Lighting · Ljus',
-          price: 165,
-          prov: 'Turned in Småland, Sweden',
-          mat: 'FSC Scandinavian Birch, pleated cotton',
-          dim: '42cm H × 26cm Shade Diameter',
-          desc: 'Spindle-turned solid birch spheres paired with a pleated blue-and-cream gingham empire shade. Emits an amber bedtime glow.',
-          img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80',
-        },
-        {
-          id: 'mug',
-          name: 'The Fika Loop Mug',
-          sub: 'Kopp för fikastunder',
-          cat: 'Tableware · Duka',
-          price: 38,
-          prov: 'Wheel-thrown in Alcobaça, Portugal',
-          mat: 'Dense stoneware with butter glaze',
-          dim: '360ml capacity, 9cm diameter',
-          desc: 'Chunky handmade fika mug with an oversized circular hoop handle. White speckled clay outside, sunny yellow inside.',
-          img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
-        },
-        {
-          id: 'brass',
-          name: 'Trollskogen Cast Brass Box',
-          sub: 'Mässingsfodral för tändstickor',
-          cat: 'Curios · Småsaker',
-          price: 48,
-          prov: 'Sand-cast in Moradabad, India',
-          mat: '100% Solid Unlacquered Brass',
-          dim: '11.5cm L × 6.5cm W',
-          desc: 'A weighty heirloom cover that slips over any matchbox. Hand-cast with whimsical Swedish forest ferns and a tiny hidden mushroom.',
-          img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
-        },
         {
           id: 'svamp',
           name: 'The Småland "Svamp" Totem',
@@ -860,8 +788,7 @@
           prov: 'Lathed in Småland, Sweden',
           mat: '100% Solid Scandinavian Birch, cold-pressed linseed oil',
           dim: '22cm H × 7cm Base',
-          desc: 'An unapologetically organic turned birch pillar featuring a pronounced domed bulb. Designed for quiet mantelpiece contemplation and tactile coffee table handling.',
-          img: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=800&q=80',
+          desc: 'An unapologetically organic turned birch pillar featuring a pronounced domed bulb. Designed for quiet mantelpiece contemplation and tactile handling.',
         },
         {
           id: 'kvist',
@@ -872,8 +799,7 @@
           prov: 'Turned in Dalarna, Sweden',
           mat: 'FSC Certified Blonde Ash Wood',
           dim: '16cm Projection × 5.5cm Girth',
-          desc: 'An ergonomic elongated turned ash wood cylinder with an anatomically curved bulb. Suitable for aprons, heavy wool coats, or simply admiring on bare timber walls.',
-          img: 'https://images.unsplash.com/photo-1532372576444-dda954194ad0?auto=format&fit=crop&w=800&q=80',
+          desc: 'An ergonomic elongated turned ash wood cylinder with an anatomically curved bulb. Suitable for aprons, heavy wool coats, or simply admiring.',
         },
         {
           id: 'sundborn',
@@ -885,7 +811,6 @@
           mat: 'Slow-grown Scandinavian Pine, beeswax polish',
           dim: '28cm H × 8cm Base',
           desc: 'A triple-tiered spherical turned pine obelisk. Rhythmically contoured with bulbous Scandinavian folk geometries and silky hand-buffed beeswax finish.',
-          img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80',
         },
         {
           id: 'pestle',
@@ -897,7 +822,28 @@
           mat: 'Nordic Beechwood, organic botanical wax',
           dim: '19cm L × 6cm Diameter',
           desc: 'A smoothly contoured Scandinavian beechwood shape with a weighted organic head. Perfectly weighted to roll and fidget with during long Scandinavian winter evenings.',
-          img: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          id: 'spira',
+          name: 'The Uppsala Fluted Spire',
+          sub: 'Svarvad pelare med räfflad fot',
+          cat: 'Turned Wood · Uppland',
+          price: 48,
+          prov: 'Turned in Gamla Uppsala, Sweden',
+          mat: 'Solid Scandinavian Birch, beeswax polish',
+          dim: '26cm H × 6.5cm Base',
+          desc: 'A stepped circular pedestal with delicate fluted rings rising into a slender tapered column, crowned with an ergonomic bulbous dome.',
+        },
+        {
+          id: 'mora',
+          name: 'The Mora Double-Bulb Totem',
+          sub: 'Tung skulptur i furu',
+          cat: 'Folk Sculptures · Dalarna',
+          price: 54,
+          prov: 'Hand-lathed in Mora, Sweden',
+          mat: 'Slow-grown Nordic Pine, cold-pressed linseed oil',
+          dim: '24cm H × 8.5cm Base',
+          desc: 'A chunky weighted spherical bottom bulb with a cinched waist collar, swelling into an oversized smooth bulbous upper head.',
         }
       ];
 
@@ -914,7 +860,7 @@
       scene.fog = new THREE.FogExp2(0x090A0E, 0.055);
 
       const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 1.4, 8.6);
+      camera.position.set(0, 1.4, 9.6);
 
       // ─── Studio Lighting for Scandinavian Turned Wood & Shaders ───
       const ambLight = new THREE.AmbientLight(0xFFF8EE, 0.75);
@@ -999,64 +945,96 @@
         if (id === 'svamp') {
           // The Småland "Svamp" Totem: Flared base, elongated pillar shaft, groove, and bulbous mushroom dome
           curve = new THREE.SplineCurve([
-            new THREE.Vector2(0, -0.85),
-            new THREE.Vector2(0.36, -0.83),
-            new THREE.Vector2(0.32, -0.72),
+            new THREE.Vector2(0, -0.90),
+            new THREE.Vector2(0.38, -0.88),
+            new THREE.Vector2(0.34, -0.75),
             new THREE.Vector2(0.20, -0.35),
             new THREE.Vector2(0.18, 0.0),
-            new THREE.Vector2(0.19, 0.28),
-            new THREE.Vector2(0.15, 0.36),
-            new THREE.Vector2(0.38, 0.50),
-            new THREE.Vector2(0.43, 0.65),
-            new THREE.Vector2(0.35, 0.78),
-            new THREE.Vector2(0.18, 0.84),
-            new THREE.Vector2(0.0, 0.85)
+            new THREE.Vector2(0.20, 0.30),
+            new THREE.Vector2(0.15, 0.38),
+            new THREE.Vector2(0.40, 0.52),
+            new THREE.Vector2(0.45, 0.68),
+            new THREE.Vector2(0.36, 0.82),
+            new THREE.Vector2(0.18, 0.88),
+            new THREE.Vector2(0.0, 0.90)
           ]);
         } else if (id === 'kvist') {
           // Kvist Contoured Peg: Mounting plate, collar, ergonomic curved waist, expanding into a smooth rounded knob head
           curve = new THREE.SplineCurve([
-            new THREE.Vector2(0, -0.85),
-            new THREE.Vector2(0.40, -0.83),
-            new THREE.Vector2(0.35, -0.74),
+            new THREE.Vector2(0, -0.90),
+            new THREE.Vector2(0.42, -0.88),
+            new THREE.Vector2(0.36, -0.76),
             new THREE.Vector2(0.24, -0.62),
             new THREE.Vector2(0.17, -0.30),
-            new THREE.Vector2(0.23, 0.0),
-            new THREE.Vector2(0.19, 0.25),
-            new THREE.Vector2(0.34, 0.52),
-            new THREE.Vector2(0.36, 0.68),
-            new THREE.Vector2(0.22, 0.83),
-            new THREE.Vector2(0.0, 0.85)
+            new THREE.Vector2(0.24, 0.0),
+            new THREE.Vector2(0.20, 0.28),
+            new THREE.Vector2(0.36, 0.54),
+            new THREE.Vector2(0.38, 0.72),
+            new THREE.Vector2(0.22, 0.88),
+            new THREE.Vector2(0.0, 0.90)
           ]);
         } else if (id === 'sundborn') {
           // The Sundborn Bobbin Monolith: Multi-tiered stacked spherical beads and crowning bulb
           curve = new THREE.SplineCurve([
-            new THREE.Vector2(0, -0.85),
-            new THREE.Vector2(0.38, -0.83),
-            new THREE.Vector2(0.34, -0.72),
-            new THREE.Vector2(0.22, -0.62),
-            new THREE.Vector2(0.33, -0.46),
-            new THREE.Vector2(0.18, -0.30),
-            new THREE.Vector2(0.31, -0.12),
-            new THREE.Vector2(0.16, 0.06),
+            new THREE.Vector2(0, -0.90),
+            new THREE.Vector2(0.40, -0.88),
+            new THREE.Vector2(0.35, -0.76),
+            new THREE.Vector2(0.22, -0.64),
+            new THREE.Vector2(0.34, -0.48),
+            new THREE.Vector2(0.18, -0.32),
+            new THREE.Vector2(0.32, -0.14),
+            new THREE.Vector2(0.16, 0.05),
             new THREE.Vector2(0.28, 0.24),
-            new THREE.Vector2(0.18, 0.42),
-            new THREE.Vector2(0.34, 0.60),
-            new THREE.Vector2(0.28, 0.76),
-            new THREE.Vector2(0.0, 0.85)
+            new THREE.Vector2(0.18, 0.44),
+            new THREE.Vector2(0.35, 0.62),
+            new THREE.Vector2(0.28, 0.80),
+            new THREE.Vector2(0.0, 0.90)
           ]);
-        } else {
+        } else if (id === 'pestle') {
           // Gotland Tactile Tumbled Obelisk: Smooth weighted teardrop/egg obelisk
           curve = new THREE.SplineCurve([
-            new THREE.Vector2(0, -0.85),
-            new THREE.Vector2(0.32, -0.82),
-            new THREE.Vector2(0.36, -0.70),
-            new THREE.Vector2(0.32, -0.38),
+            new THREE.Vector2(0, -0.90),
+            new THREE.Vector2(0.34, -0.86),
+            new THREE.Vector2(0.38, -0.72),
+            new THREE.Vector2(0.34, -0.40),
             new THREE.Vector2(0.22, -0.05),
-            new THREE.Vector2(0.23, 0.22),
-            new THREE.Vector2(0.33, 0.50),
-            new THREE.Vector2(0.30, 0.70),
-            new THREE.Vector2(0.16, 0.83),
-            new THREE.Vector2(0.0, 0.85)
+            new THREE.Vector2(0.24, 0.22),
+            new THREE.Vector2(0.35, 0.52),
+            new THREE.Vector2(0.32, 0.74),
+            new THREE.Vector2(0.17, 0.88),
+            new THREE.Vector2(0.0, 0.90)
+          ]);
+        } else if (id === 'spira') {
+          // The Uppsala Fluted Spire: Stepped pedestal with fluted rings, tall slender column, and bulbous tip
+          curve = new THREE.SplineCurve([
+            new THREE.Vector2(0, -0.90),
+            new THREE.Vector2(0.44, -0.88),
+            new THREE.Vector2(0.42, -0.80),
+            new THREE.Vector2(0.28, -0.76),
+            new THREE.Vector2(0.32, -0.68),
+            new THREE.Vector2(0.20, -0.64),
+            new THREE.Vector2(0.16, -0.20),
+            new THREE.Vector2(0.15, 0.20),
+            new THREE.Vector2(0.18, 0.45),
+            new THREE.Vector2(0.14, 0.52),
+            new THREE.Vector2(0.30, 0.68),
+            new THREE.Vector2(0.28, 0.82),
+            new THREE.Vector2(0.0, 0.90)
+          ]);
+        } else {
+          // The Mora Double-Bulb Totem ('mora'): Chunky heavy spherical bottom bulb, pinch neck, large upper dome
+          curve = new THREE.SplineCurve([
+            new THREE.Vector2(0, -0.90),
+            new THREE.Vector2(0.32, -0.88),
+            new THREE.Vector2(0.42, -0.65),
+            new THREE.Vector2(0.40, -0.40),
+            new THREE.Vector2(0.20, -0.15),
+            new THREE.Vector2(0.18, 0.05),
+            new THREE.Vector2(0.24, 0.20),
+            new THREE.Vector2(0.42, 0.48),
+            new THREE.Vector2(0.44, 0.68),
+            new THREE.Vector2(0.32, 0.85),
+            new THREE.Vector2(0.0, 0.90)
           ]);
         }
 
@@ -1101,6 +1079,13 @@
           ctx.arc(60, 52, 14, 0, Math.PI * 2);
           ctx.arc(60, 76, 16, 0, Math.PI * 2);
           ctx.rect(42, 92, 36, 6);
+        } else if (id === 'spira') {
+          ctx.arc(60, 35, 14, 0, Math.PI * 2);
+          ctx.lineTo(64, 86);
+          ctx.rect(42, 88, 36, 8);
+        } else if (id === 'mora') {
+          ctx.arc(60, 38, 20, 0, Math.PI * 2);
+          ctx.arc(60, 74, 18, 0, Math.PI * 2);
         } else {
           ctx.ellipse(60, 58, 22, 34, 0, 0, Math.PI * 2);
         }
@@ -1108,66 +1093,36 @@
         return c.toDataURL();
       }
 
-      const LATHE_IDS = ['svamp', 'kvist', 'sundborn', 'pestle'];
+      const LATHE_IDS = ['svamp', 'kvist', 'sundborn', 'pestle', 'spira', 'mora'];
 
-      // ─── 3. 3D Floating Kinetic Product Arc ───
+      // ─── 3. 3D Floating Kinetic Sculptural Orbit ───
       const cardsGroup = new THREE.Group();
       scene.add(cardsGroup);
 
-      const textureLoader = new THREE.TextureLoader();
       const cardMeshes = [];
       const CARD_COUNT = PRODUCTS.length;
-      const ARC_RADIUS = 5.2;
-
-      // Card Geometry: Rounded bevel plaque with photographic face
-      const cardGeo = new THREE.PlaneGeometry(1.6, 2.0);
+      const ARC_RADIUS = 6.8; // Generous luxury gallery spacing
 
       PRODUCTS.forEach((prod, idx) => {
-        if (LATHE_IDS.includes(prod.id)) {
-          prod.thumbImg = createLatheThumbnail(prod.id);
+        prod.thumbImg = createLatheThumbnail(prod.id);
 
-          // Pure Freestanding 3D Procedural Lathe Sculpture (NO flat backing panes)
-          const group = new THREE.Group();
-          group.userData.index = idx;
-          group.userData.product = prod;
-          group.userData.isLathe = true;
+        // Pure Freestanding 3D Procedural Lathe Sculpture (Zero flat panes)
+        const group = new THREE.Group();
+        group.userData.index = idx;
+        group.userData.product = prod;
+        group.userData.isLathe = true;
 
-          // Live 3D Lathe Sculpture - freestanding, clean, sculptural
-          const latheGeo = getLatheGeometry(prod.id);
-          const latheMesh = new THREE.Mesh(latheGeo, woodMaterial.clone());
-          latheMesh.position.set(0, 0, 0);
-          latheMesh.scale.set(1.35, 1.35, 1.35);
-          latheMesh.userData = group.userData;
-          group.add(latheMesh);
-          group.userData.latheMesh = latheMesh;
+        // Live 3D Lathe Sculpture - freestanding, clean, sculptural
+        const latheGeo = getLatheGeometry(prod.id);
+        const latheMesh = new THREE.Mesh(latheGeo, woodMaterial.clone());
+        latheMesh.position.set(0, 0, 0);
+        latheMesh.scale.set(1.4, 1.4, 1.4);
+        latheMesh.userData = group.userData;
+        group.add(latheMesh);
+        group.userData.latheMesh = latheMesh;
 
-          cardsGroup.add(group);
-          cardMeshes.push(group);
-
-        } else {
-          // Photographic Product Plaque
-          const tex = textureLoader.load(prod.img);
-          tex.generateMipmaps = true;
-
-          const mat = new THREE.MeshBasicMaterial({
-            map: tex,
-            side: THREE.DoubleSide,
-          });
-
-          const mesh = new THREE.Mesh(cardGeo, mat);
-          mesh.userData.index = idx;
-          mesh.userData.product = prod;
-
-          // Brass Frame Trim behind the picture
-          const frameGeo = new THREE.PlaneGeometry(1.66, 2.06);
-          const frameMat = new THREE.MeshBasicMaterial({ color: 0xE5C384, side: THREE.DoubleSide });
-          const frame = new THREE.Mesh(frameGeo, frameMat);
-          frame.position.z = -0.01;
-          mesh.add(frame);
-
-          cardsGroup.add(mesh);
-          cardMeshes.push(mesh);
-        }
+        cardsGroup.add(group);
+        cardMeshes.push(group);
       });
 
       // ─── 5. State, Physics & Orbital Positioning ───
