@@ -932,84 +932,65 @@
       accentLight.position.set(0, 0.5, 3.2);
       scene.add(accentLight);
 
-      // ─── Procedural Wood Textures ───
+      // ─── Real High-Resolution Hardwood Woodgrain Texture & Bump ───
+      const woodTextureLoader = new THREE.TextureLoader();
+      
+      const woodDiffuse = woodTextureLoader.load('./textures/wood_diffuse.jpg');
+      woodDiffuse.wrapS = THREE.RepeatWrapping;
+      woodDiffuse.wrapT = THREE.RepeatWrapping;
+      woodDiffuse.repeat.set(1.5, 3);
+
+      const woodBump = woodTextureLoader.load('./textures/wood_bump.jpg');
+      woodBump.wrapS = THREE.RepeatWrapping;
+      woodBump.wrapT = THREE.RepeatWrapping;
+      woodBump.repeat.set(1.5, 3);
+
+      const woodRoughness = woodTextureLoader.load('./textures/wood_roughness.jpg');
+      woodRoughness.wrapS = THREE.RepeatWrapping;
+      woodRoughness.wrapT = THREE.RepeatWrapping;
+      woodRoughness.repeat.set(1.5, 3);
+
+      // Procedural fallback with distinct high-contrast growth rings
       function createWoodTexture() {
-        const c = document.createElement('canvas');
-        c.width = 1024;
-        c.height = 1024;
-        const ctx = c.getContext('2d');
-
-        // Blonde Scandinavian Birch / Pine base tone
-        ctx.fillStyle = '#E6D3B6';
-        ctx.fillRect(0, 0, 1024, 1024);
-
-        // Longitudinal wood fiber streaks
-        for (let x = 0; x < 1024; x++) {
-          const n = Math.sin(x * 0.07) * 0.5 + Math.sin(x * 0.22) * 0.3 + (Math.random() - 0.5) * 0.25;
-          const tone = Math.floor(215 + n * 24);
-          ctx.fillStyle = `rgba(${tone}, ${Math.floor(tone * 0.88)}, ${Math.floor(tone * 0.72)}, 0.4)`;
-          ctx.fillRect(x, 0, 1, 1024);
-        }
-
-        // Concentric annual growth rings & lathe lines
-        for (let y = 0; y < 1024; y += 3) {
-          const lNoise = Math.sin(y * 0.14) * 0.5 + (Math.random() - 0.5) * 0.5;
-          if (lNoise > 0.18) {
-            ctx.fillStyle = `rgba(135, 92, 52, ${0.08 + lNoise * 0.08})`;
-            ctx.fillRect(0, y, 1024, 1.6);
-          }
-        }
-
-        // Warm organic knots
-        for (let i = 0; i < 5; i++) {
-          const kx = 120 + Math.random() * 780;
-          const ky = 80 + Math.random() * 860;
-          const grad = ctx.createRadialGradient(kx, ky, 2, kx, ky, 35 + Math.random() * 30);
-          grad.addColorStop(0, 'rgba(120, 78, 42, 0.25)');
-          grad.addColorStop(0.5, 'rgba(160, 115, 75, 0.1)');
-          grad.addColorStop(1, 'rgba(230, 211, 182, 0)');
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.ellipse(kx, ky, 30, 10, 0.1, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        const tex = new THREE.CanvasTexture(c);
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(1, 2);
-        return tex;
-      }
-
-      function createWoodBumpTexture() {
         const c = document.createElement('canvas');
         c.width = 512;
         c.height = 512;
         const ctx = c.getContext('2d');
-        ctx.fillStyle = '#808080';
+        ctx.fillStyle = '#C89358';
         ctx.fillRect(0, 0, 512, 512);
 
-        for (let y = 0; y < 512; y += 2) {
-          const val = Math.floor(128 + Math.sin(y * 0.45) * 22 + (Math.random() - 0.5) * 16);
-          ctx.fillStyle = `rgb(${val},${val},${val})`;
-          ctx.fillRect(0, y, 512, 1);
+        const imgData = ctx.getImageData(0, 0, 512, 512);
+        const data = imgData.data;
+        for (let y = 0; y < 512; y++) {
+          for (let x = 0; x < 512; x++) {
+            const idx = (y * 512 + x) * 4;
+            const nx = x * 0.024;
+            const ny = y * 0.006;
+            const wave = Math.sin(nx * 4.0 + Math.sin(ny * 8.0) * 1.5);
+            const ring = Math.sin(nx * 26.0 + wave * 3.0);
+            const factor = (ring * 0.5 + 0.5) * 0.5;
+            data[idx] = Math.floor(205 - factor * 85);
+            data[idx + 1] = Math.floor(150 - factor * 70);
+            data[idx + 2] = Math.floor(95 - factor * 48);
+            data[idx + 3] = 255;
+          }
         }
+        ctx.putImageData(imgData, 0, 0);
         const tex = new THREE.CanvasTexture(c);
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(1.5, 3);
         return tex;
       }
 
-      const woodMap = createWoodTexture();
-      const woodBump = createWoodBumpTexture();
-
       const woodMaterial = new THREE.MeshStandardMaterial({
-        map: woodMap,
+        map: woodDiffuse,
         bumpMap: woodBump,
-        bumpScale: 0.012,
-        roughness: 0.36,
-        metalness: 0.02,
-        color: 0xF5E6CF,
+        bumpScale: 0.035,
+        roughnessMap: woodRoughness,
+        roughness: 0.42,
+        metalness: 0.04,
+        color: 0xE8B878, // Warm rich honey amber Scandinavian birch/pine
       });
 
       // ─── THREE.LatheGeometry Scandinavian Sculptures ───
