@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-butter: #F8E7B4;
+    --color-butter-light: #FDF7E7;
+    --color-butter-dark: #E6CE8A;
+    --color-lingon: #BF3A3A;
+    --color-lingon-light: #F9EBEB;
+    --color-moss: #38523A;
+    --color-moss-light: #EBF1EC;
+    --color-cobalt: #284B63;
+    --color-oat: #F6F1EA;
+    --color-paper: #FCFAF6;
+    --color-bark: #2C2621;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-bark);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-reum {
+    font-family: "Georgia", "Baskerville", "Times New Roman", serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Wavy and scalloped whimsical borders */
+.scallop-border-bottom {
+  position: relative;
+}
+.scallop-border-bottom::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  height: 10px;
+  background-size: 20px 10px;
+  background-repeat: repeat-x;
+  background-image: radial-gradient(circle at 10px 0px, transparent 10px, currentColor 10.5px);
+}
+
+.wiggle-underline {
+  text-decoration: underline wavy var(--color-lingon);
+  text-underline-offset: 6px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F6F1EA;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8CEBE;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #BF3A3A;
+}
