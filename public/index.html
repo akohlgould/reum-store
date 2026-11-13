@@ -726,14 +726,6 @@
       </div>
     </header>
 
-    <!-- Center Hero Typography -->
-    <div class="hero-center" id="hero-center">
-      <h1 class="hero-headline">
-        A Reum <br />
-        <span>with a wink.</span>
-      </h1>
-    </div>
-
   </div>
 
   <!-- OBJECT INSPECTION MODAL -->
@@ -1153,50 +1145,17 @@
         if (LATHE_IDS.includes(prod.id)) {
           prod.thumbImg = createLatheThumbnail(prod.id);
 
-          // Full 3D Procedural Lathe Product Showcase Group
+          // Pure Freestanding 3D Procedural Lathe Sculpture (NO flat backing panes)
           const group = new THREE.Group();
           group.userData.index = idx;
           group.userData.product = prod;
           group.userData.isLathe = true;
 
-          // Smoked obsidian backing plaque
-          const plaqueGeo = new THREE.PlaneGeometry(1.6, 2.0);
-          const plaqueMat = new THREE.MeshStandardMaterial({
-            color: 0x121419,
-            roughness: 0.28,
-            metalness: 0.15,
-            transparent: true,
-            opacity: 0.88,
-            side: THREE.DoubleSide
-          });
-          const plaque = new THREE.Mesh(plaqueGeo, plaqueMat);
-          plaque.userData = group.userData;
-          group.add(plaque);
-
-          // Brass frame rim
-          const frameGeo = new THREE.PlaneGeometry(1.66, 2.06);
-          const frameMat = new THREE.MeshBasicMaterial({ color: 0xE5C384, side: THREE.DoubleSide });
-          const frame = new THREE.Mesh(frameGeo, frameMat);
-          frame.position.z = -0.01;
-          plaque.add(frame);
-
-          // Turned brass pedestal disc chuck
-          const pedGeo = new THREE.CylinderGeometry(0.52, 0.55, 0.04, 32);
-          const pedMat = new THREE.MeshStandardMaterial({
-            color: 0xE5C384,
-            roughness: 0.22,
-            metalness: 0.82
-          });
-          const pedestal = new THREE.Mesh(pedGeo, pedMat);
-          pedestal.position.set(0, -0.84, 0.20);
-          pedestal.rotation.x = 0.15;
-          group.add(pedestal);
-
-          // Live 3D Lathe Sculpture
+          // Live 3D Lathe Sculpture - freestanding, clean, sculptural
           const latheGeo = getLatheGeometry(prod.id);
           const latheMesh = new THREE.Mesh(latheGeo, woodMaterial.clone());
-          latheMesh.position.set(0, 0.08, 0.20);
-          latheMesh.scale.set(1.10, 1.10, 1.10);
+          latheMesh.position.set(0, 0, 0);
+          latheMesh.scale.set(1.35, 1.35, 1.35);
           latheMesh.userData = group.userData;
           group.add(latheMesh);
           group.userData.latheMesh = latheMesh;
@@ -1473,7 +1432,7 @@
       function openDetail(product) {
         playChime();
         isDetailActive = true;
-        heroCenter.classList.add('blurred');
+        if (heroCenter) heroCenter.classList.add('blurred');
 
         document.getElementById('det-title').textContent = product.name;
         document.getElementById('det-price').textContent = `$${product.price}`;
@@ -1507,7 +1466,7 @@
         isDetailActive = false;
         stopDetail3D();
         detailOverlay.classList.remove('active');
-        heroCenter.classList.remove('blurred');
+        if (heroCenter) heroCenter.classList.remove('blurred');
       };
 
       // ─── 8. Shopping Bag State ───
