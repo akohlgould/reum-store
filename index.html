@@ -730,6 +730,10 @@
         <button class="scrub-pill" onclick="orbitTo(3)">Bobbin Lamp</button>
         <button class="scrub-pill" onclick="orbitTo(4)">Fika Mug</button>
         <button class="scrub-pill" onclick="orbitTo(5)">Cast Brass Box</button>
+        <button class="scrub-pill" onclick="orbitTo(6)">"Svamp" Totem</button>
+        <button class="scrub-pill" onclick="orbitTo(7)">Kvist Contoured Peg</button>
+        <button class="scrub-pill" onclick="orbitTo(8)">Sundborn Monolith</button>
+        <button class="scrub-pill" onclick="orbitTo(9)">Gotland Obelisk</button>
       </div>
     </div>
 
@@ -869,6 +873,54 @@
           dim: '11.5cm L × 6.5cm W',
           desc: 'A weighty heirloom cover that slips over any matchbox. Hand-cast with whimsical Swedish forest ferns and a tiny hidden mushroom.',
           img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          id: 'svamp',
+          name: 'The Småland "Svamp" Totem',
+          sub: 'Svarvad björkpelare med rund topp',
+          cat: 'Turned Wood · Småland',
+          price: 46,
+          prov: 'Lathed in Småland, Sweden',
+          mat: '100% Solid Scandinavian Birch, cold-pressed linseed oil',
+          dim: '22cm H × 7cm Base',
+          desc: 'An unapologetically organic turned birch pillar featuring a pronounced domed bulb. Designed for quiet mantelpiece contemplation and tactile coffee table handling.',
+          img: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          id: 'kvist',
+          name: 'Kvist Contoured Wall Peg',
+          sub: 'Skulptural träknopp i ask',
+          cat: 'Wood Sculptures · Hemslöjd',
+          price: 34,
+          prov: 'Turned in Dalarna, Sweden',
+          mat: 'FSC Certified Blonde Ash Wood',
+          dim: '16cm Projection × 5.5cm Girth',
+          desc: 'An ergonomic elongated turned ash wood cylinder with an anatomically curved bulb. Suitable for aprons, heavy wool coats, or simply admiring on bare timber walls.',
+          img: 'https://images.unsplash.com/photo-1532372576444-dda954194ad0?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          id: 'sundborn',
+          name: 'The Sundborn Bobbin Monolith',
+          sub: 'Flerstegs totempåle i furu',
+          cat: 'Curios · Dalarna',
+          price: 52,
+          prov: 'Hand-turned in Sundborn, Sweden',
+          mat: 'Slow-grown Scandinavian Pine, beeswax polish',
+          dim: '28cm H × 8cm Base',
+          desc: 'A triple-tiered spherical turned pine obelisk. Rhythmically contoured with bulbous Scandinavian folk geometries and silky hand-buffed beeswax finish.',
+          img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          id: 'pestle',
+          name: 'Gotland Tactile Tumbled Obelisk',
+          sub: 'Ergonomisk bordskulptur i bok',
+          cat: 'Tactile Objects · Gotland',
+          price: 42,
+          prov: 'Lathed & stone-tumbled on Gotland, Sweden',
+          mat: 'Nordic Beechwood, organic botanical wax',
+          dim: '19cm L × 6cm Diameter',
+          desc: 'A smoothly contoured Scandinavian beechwood shape with a weighted organic head. Perfectly weighted to roll and fidget with during long Scandinavian winter evenings.',
+          img: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80',
         }
       ];
 
@@ -885,7 +937,7 @@
       scene.fog = new THREE.FogExp2(0x090A0E, 0.055);
 
       const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 1.4, 7.5);
+      camera.position.set(0, 1.4, 8.6);
 
       // ─── 3. Glowing Meadow Particles with GLSL Shaders ───
       // 2,500 glowing flower and firefly spores blooming across 3D space
@@ -990,7 +1042,7 @@
       const textureLoader = new THREE.TextureLoader();
       const cardMeshes = [];
       const CARD_COUNT = PRODUCTS.length;
-      const ARC_RADIUS = 4.2;
+      const ARC_RADIUS = 5.2;
 
       // Card Geometry: Rounded bevel plaque with photographic face
       const cardGeo = new THREE.PlaneGeometry(1.6, 2.0);
